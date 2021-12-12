@@ -1,6 +1,42 @@
 # Results
 
 ```{r}
+library(plyr)
+
+ADA <- data.frame(read.csv(file = './data/ADA-USD.csv')[, c("Date","Adj.Close", "Volume")])
+BTC <- data.frame(read.csv(file = './data/BTC-USD.csv')[, c("Date","Adj.Close", "Volume")])
+DOGE <- data.frame(read.csv(file = './data/DOGE-USD.csv')[, c("Date","Adj.Close", "Volume")])
+ETC <- data.frame(read.csv(file = './data/ETC-USD.csv')[, c("Date","Adj.Close", "Volume")])
+ETH <- data.frame(read.csv(file = './data/ETH-USD.csv')[, c("Date","Adj.Close", "Volume")])
+#SOL <- data.frame(read.csv(file = './data/SOL.csv')[, c("Date","Adj.Close","Volume")])
+XRP <- data.frame(read.csv(file = './data/XRP-USD.csv')[, c("Date","Adj.Close","Volume")])
+
+dataName = c("ADA", "BTC", "DOGE", "ETC", "ETH", "XRP")
+for (name in dataName) {
+  lapply(get(name)[["Adj.Close"]],as.numeric)
+}
+
+names(ADA)[2] <- paste("ADA", "Adj.Close", sep="_")
+names(ADA)[3] <- paste("ADA", "Volume", sep="_")
+names(BTC)[2] <- paste("BTC", "Adj.Close", sep="_")
+names(BTC)[3] <- paste("BTC", "Volume", sep="_")
+names(DOGE)[2] <- paste("DOGE", "Adj.Close", sep="_")
+names(DOGE)[3] <- paste("DOGE", "Volume", sep="_")
+names(ETC)[2] <- paste("ETC", "Adj.Close", sep="_")
+names(ETC)[3] <- paste("ETC", "Volume", sep="_")
+names(ETH)[2] <- paste("ETH", "Adj.Close", sep="_")
+names(ETH)[3] <- paste("ETH", "Volume", sep="_")
+#names(SOL)[2] <- paste("SOL", "Adj.Close", sep="_")
+#names(SOL)[3] <- paste("SOL", "Volume", sep="_")
+names(XRP)[2] <- paste("XRP", "Adj.Close", sep="_")
+names(XRP)[3] <- paste("XRP", "Volume", sep="_")
+
+cryptos <- join_all(list(ADA, BTC, DOGE, ETC, ETH, XRP), by='Date', type='full')
+
+```
+
+
+```{r}
 library(stringr)
 library(tidyverse)
 close=cryptos[grep(".*_Adj.Close",colnames(cryptos))]
@@ -47,7 +83,7 @@ close_date = data.frame(Date=cryptos$Date,close)
 
 close_date %>% 
   pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
-  ggplot(aes(x=1:nrow(.),y=Adj.Close, color=stock_name)) +
+  ggplot(aes(x=Date,y=Adj.Close, color=stock_name)) +
   geom_line()+
   #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
   #ggtitle("log(Adj.Close)")
@@ -60,7 +96,7 @@ for(stock_name in dataName){
   i=i+1
   tmp_close=cryptos[[paste(stock_name,"_Adj.Close",sep = "")]]
   tmp_df = data.frame(Adj.Close=tmp_close,Date=cryptos$Date)
-  tmp_plot = ggplot(tmp_df,aes(x=1:nrow(cryptos), y=Adj.Close)) + 
+  tmp_plot = ggplot(tmp_df,aes(x=Date, y=Adj.Close)) + 
     geom_line() + 
     #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
     xlab("date") +
@@ -74,14 +110,14 @@ grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2, nrow=3)
 #存在一个问题 各个stock的close数量级差别有点大，最好标准化
 # 标准化之后的ridge图意义是在观察close在分位数上的趋势分布
 # 比起普通6条折线在一个图的优点是，他们的纵坐标相差很大会导致
-close_date %>% 
-  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
-  #filter(stock_name=="BTC_Adj.Close") %>%
-  ggplot(aes(x=Adj.Close, y=reorder(stock_name, Adj.Close, median))) +
-  geom_density_ridges(rel_min_height = 0.01,fill="blue", alpha=0.5)+
-  scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
-  ggtitle("log(Adj.Close)")
-  theme_grey(14)
+#close_date %>% 
+#  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+#  #filter(stock_name=="BTC_Adj.Close") %>%
+#  ggplot(aes(x=Adj.Close, y=reorder(stock_name, Adj.Close, median))) +
+#  geom_density_ridges(rel_min_height = 0.01,fill="blue", alpha=0.5)+
+#  scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+#  ggtitle("log(Adj.Close)")
+#  theme_grey(14)
 ```
 
 
@@ -93,8 +129,6 @@ close_date_scaled %>%
   pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
   ggplot(aes(x=Date,y=Adj.Close, color=stock_name)) +
   geom_line()+
-  #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
-  #ggtitle("log(Adj.Close)")
   theme_grey(14)
 
 
@@ -115,14 +149,216 @@ close_date_scaled %>%
 
 ```
 
+
+
+
 ```{r}
 library(parcoords)
+library(lubridate)
+
+Sys.setlocale("LC_TIME", "English")
+close_month_scaled = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct_inorder(factor(month(cryptos$Date, label=TRUE))),close_scaled) %>%
+  dplyr::group_by(Year,Month)%>%
+  dplyr::summarise(
+    ADA_Adj.Close=mean(ADA_Adj.Close),
+    BTC_Adj.Close=mean(BTC_Adj.Close),
+    DOGE_Adj.Close=mean(DOGE_Adj.Close),
+    ETC_Adj.Close=mean(ETC_Adj.Close),
+    ETH_Adj.Close=mean(ETH_Adj.Close),
+    XRP_Adj.Close=mean(XRP_Adj.Close)
+    )%>%
+  ungroup()
+
+#18年的12个月
+tmp=subset(mutate(close_month_scaled, Month=paste(Year,Month,sep=" ")), select = -c(Year))
+tmp=data.frame(tmp,row.names = 1)
+tmp=as.data.frame(t(tmp))
+close_month_scaled_t = data.frame(Stock=rownames(tmp),tmp,row.names = NULL)
+
 parcoords::parcoords(
-  mtcars
-  ,reorderable = TRUE
-  ,brushMode = "2d-strums"
-  , withD3 = TRUE
+  close_month_scaled_t,
+  rownames = FALSE,
+  reorderable = TRUE,
+  brushMode = "1d-Multi",
+  brushPredicate = "OR",
+  color = list(colorScale = "scaleOrdinal", colorBy = "Stock", colorScheme = "schemeDark2"),
+  withD3 = TRUE
 )
+```
+
+```{r}
+library(corrplot)
+
+return = data.frame(apply(close,2,diff,1,1))
+
+i=0
+for (name in colnames(return)){
+  i=i+1
+  colnames(return)[i]=paste(substr(name,1,3),"return",sep="_")
+}
+
+return_date = data.frame(Date=cryptos$Date[2:nrow(cryptos)],return)
+return_scaled = data.frame(scale(return))
+return_date_scaled = data.frame(Date=cryptos$Date[2:nrow(cryptos)],return_scaled)
+
+# 注意标准化不会影响相关系数，这里只是为了后续好处理
+corrplot(corr=cor(return_scaled),method="circle",order = "AOE",addCoef.col = "grey")
+
+corrplot(corr=cor(close_scaled),method="circle",order = "AOE",addCoef.col = "grey")
+```
+
+
+```{r}
+
+corrplot(corr=cor(filter(close_date_scaled,year(Date)==2018)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey")
+
+corrplot(corr=cor(filter(close_date_scaled,year(Date)==2019)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey")
+
+corrplot(corr=cor(filter(close_date_scaled,year(Date)==2020)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey")
+
+# 每个虚拟货币都有减半的时间点 比如BTC halving最近发生在2020年5月11日 会影响货币股价
+#但是观察前面的无标准化图可以看出其实2020五月份附近波动没有非常剧烈
+#原因是这是大家都能知道的结果 对整个市场在该时间点之前都是已知的信息 无法影响市场
+print("BTC return during the halving month")
+return_date[return_date$Date>=as.Date("2020-5-1") & return_date$Date<=as.Date("2020-5-31"),]$BTC_return
+print("BTC return range during these three years")
+range(return_date$BTC_return)
+
+```
+
+```{r, fig.height=5, fig.width=10}
+close_date %>% 
+  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+  mutate(stock_name=substr(stock_name,1,3)) %>%
+  ggplot(aes(x=Date,y=Adj.Close)) +
+  geom_line()+
+  geom_smooth(method = "loess", se=FALSE, span=0.5 ,lwd=1)+
+  facet_grid(stock_name~.,scales = "free_y")+
+  theme_grey(14)
+
+```
+
+```{r}
+library(forecast)
+#这里以天为单位的时间序列最后是2020的第362天的原因是中间缺少了4天缺失值
+#STL比起普通的compose优点是不受离群点干扰获得稳定的分解，但是是加法分解（additive decomposition）
+#Y=T+S+I 这里的T其实是经典时间序列分解里的TC项，为了避免对C通过基于历史周期性因素认为判断，所以直接将二者合起来了，但是考虑到虚拟货币价格并不太具有周期性，且STl对T和S都进行了局部多项式回归（用Loess估算非线性关系）而非简单的线性回归趋势外推，所以不规则扰动项依然保持着随机性
+
+#加法分解存在的问题是
+#1、分解的时候，对T的预测总是缺乏首尾的数值（其实是对T缺首，对C缺首尾）。这一点做滑动平均（moving average）就会有体会，用前n个序列的均值来作为n+1时刻的趋势预测，那么前面n个数值注定都是缺失值，而最后n个数值也无法获得。
+
+#2、对于骤增和骤降不敏感，显得过于平滑，因此如果有突发的事件也难以进行捕捉；
+
+#3、对季节性的预测非常刻板，基本假设中周期性是固定的，如果随着时间改变其周期性波动也发生改变，可加性分解就无法捕捉到。
+
+#由于STl是加法分解，T中隐含的周期性因素一定是波动的而不是具有explicit pattern的，所以可加性分解一定无法捕捉到这种信息，会导致预测不准确
+
+#所以我们使用乘法预测（multiplicative decomposition），也就是Y=T*S*I，但是STL本身并不提供这个选项，所以我们对原始数据取log，分解后再对各成分反向变化取指数
+#（用box-cox变换就可以，lambda=0就是乘法分解，lambda=1就是加法分解）
+
+#C和S的区别是季节性因素的波动长度固定，例如每12个月都是一个大致在x1,...,x12的水平，而周期性因素的波动长度一般是不一样的，例如1-7天维持一个稳定水平x1，8-10天维持另一个水平x2，11-15天又维持一个水平x3
+
+close_ts<-ts(close,frequency=365,start=c(2018,1,1))
+
+close_stl=close_ts[,"ADA_Adj.Close"] %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE)
+autoplot(close_stl)
+fcast=forecast(close_stl,method = "naive",h=30)
+fcast %>% autoplot()
+
+fcast <- stlf(close_ts[,"ADA_Adj.Close"], method='naive' ,h=30, level=c(80,95))
+fcast %>% autoplot()
+
+
+close_month = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct_inorder(factor(month(cryptos$Date, label=TRUE))),close) %>%
+  dplyr::group_by(Year,Month)%>%
+  dplyr::summarise(
+    ADA_Adj.Close=mean(ADA_Adj.Close),
+    BTC_Adj.Close=mean(BTC_Adj.Close),
+    DOGE_Adj.Close=mean(DOGE_Adj.Close),
+    ETC_Adj.Close=mean(ETC_Adj.Close),
+    ETH_Adj.Close=mean(ETH_Adj.Close),
+    XRP_Adj.Close=mean(XRP_Adj.Close)
+    )%>%
+  ungroup()
+
+close_month_ts<-ts(close_month,frequency=12,start=c(2018,1))
+
+close_month_stl = close_month_ts[,"BTC_Adj.Close"] %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE)
+
+autoplot(close_month_stl)
+
+fcast=forecast(close_month_stl,method = "naive",h=6)
+fcast %>% autoplot()
+
+
+#观察两个预测图，二者的区别是乘法预测的置信区间有着和expectation一样的变化趋势（随着forecast value变化，置信区间以相同趋势波动），而加法预测的置信区间的发散更加明显（随着forecast value上升，置信区间上界在上升，下界在下降）
+# Multiplicative Decomposition
+tmp=as.data.frame(apply(close_month[3:length(close_month)],c(1,2),BoxCox,lambda=0,simplify = FALSE))
+close_month_trans=data.frame(close_month[1:2],tmp)
+close_month_trans_ts<-ts(close_month_trans,frequency=12,start=c(2018,1))
+close_month_trans_stl = close_month_trans_ts[,"BTC_Adj.Close"] %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE)
+
+autoplot(close_month_trans_stl)
+
+fcast=forecast(close_month_trans_stl,method = "naive",h=6)
+fcast %>% autoplot()
+```
+
+
+```{r, fig.height=10,fig.width=6}
+p=paste0('p',1:length(dataName))
+i=0
+for(stock_name in dataName){
+  i=i+1
+  close_month_trans_stl = close_month_trans_ts[,paste(stock_name,"Adj.Close",sep="_")] %>%
+    stl(t.window=13, s.window="periodic", robust=TRUE)
+  fcast=forecast(close_month_trans_stl,method = "naive",h=6)
+  assign(p[i], fcast %>% autoplot(main=paste("Forecasts of",stock_name, "from STL",sep=" ")))
+}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
+```
+```{r, fig.height=10,fig.width=6}
+#先出示这个图，展示在天为单位的预测中，波动十分剧烈，不太稳定，然后展示月为单位的预测，可以从最开始的分布图中发现所有的股价除了2018年初那段时间后面变化基本十分平滑，所以可以以月份为单位进行股价均值的预测，对于投资人来说只需要在一个月中选择合适的时机进入市场即可（例如2022年1月的预测均值比较低，3月比较高，适合1月买入，3月卖出，那么如果1月某一天达到预测的80%置信区间下界附近，就非常适合进入市场）
+
+tmp=as.data.frame(apply(close,c(1,2),BoxCox,lambda=0,simplify = FALSE))
+close_date_trans=data.frame(close_date$Date,tmp)
+close_date_trans_ts<-ts(close_date_trans,frequency=365,start=c(2018,1,1))
+
+p=paste0('p',1:length(dataName))
+i=0
+for(stock_name in dataName){
+  i=i+1
+  close_date_trans_stl = close_date_trans_ts[,paste(stock_name,"Adj.Close",sep="_")] %>%
+    stl(t.window=13, s.window="periodic", robust=TRUE)
+  fcast=forecast(close_date_trans_stl,method = "naive",h=30)
+  assign(p[i], fcast %>% autoplot(main=paste("Forecasts of",stock_name, "from STL",sep=" ")))
+}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
+```
+
+```{r,fig.height=10,fig.width=6}
+# 观察不规则变动remainder的分布，对于不稳定的stock可以用最近一段时期内数据的相关系数较高的其他稳定的stock来辅助建立投资策略
+
+# 这里还需要思考一下如何在波峰上面标出pink point来辅助观察pattern
+
+tmp=as.data.frame(apply(close,c(1,2),BoxCox,lambda=0,simplify = FALSE))
+close_date_trans=data.frame(close_date$Date,tmp)
+close_date_trans_ts<-ts(close_date_trans,frequency=365,start=c(2018,1,1))
+
+p=paste0('p',1:length(dataName))
+i=0
+for(stock_name in dataName){
+  i=i+1
+  close_date_trans_stl = close_date_trans_ts[,paste(stock_name,"Adj.Close",sep="_")] %>%
+    stl(t.window=13, s.window="periodic", robust=TRUE)
+  
+  assign(p[i], remainder(close_date_trans_stl) %>% autoplot(main=paste("Remainders of",stock_name, "from STL",sep=" "), ylab="remainders",xlab="date"))
+}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
+
 ```
 
 
