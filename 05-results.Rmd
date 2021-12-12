@@ -1,1 +1,129 @@
 # Results
+
+```{r}
+library(stringr)
+library(tidyverse)
+close=cryptos[grep(".*_Adj.Close",colnames(cryptos))]
+cryptos$Date = as.Date(cryptos$Date)
+pairs(close)
+```
+
+
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+#missingRows = which(BTC == "null")
+#BTC=BTC[-missingRows,]
+#BTC=as.data.frame(lapply(BTC,as.numeric))
+
+p=paste0('p',1:length(dataName))
+i=0
+for(stock_name in dataName){
+  i=i+1
+  tmp_close=cryptos[[paste(stock_name,"_Adj.Close",sep = "")]]
+  tmp_volume=cryptos[[paste(stock_name,"_Volume",sep = "")]]
+  tmp_df = data.frame(Adj.Close=tmp_close,Volume=tmp_volume)
+  tmp_plot = ggplot(tmp_df,aes(y=Adj.Close,x=Volume)) + 
+    geom_point(size=0.05) + 
+    scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+    xlab("log(Volume)") +
+    ylab("Adj.Close") +
+    ggtitle(stock_name)+
+    theme_bw()
+  assign(p[i], tmp_plot)
+}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2, nrow=3)
+```
+
+
+
+```{r}
+library(ggridges)
+close_date = data.frame(Date=cryptos$Date,close)
+#close_date$Date=factor(close_date$Date)
+#plot(close_date$Date,close_date$ADA_Adj.Close)
+#ggplot(close_date,aes(x=1:nrow(close_date),y=ADA_Adj.Close))+geom_line()
+
+close_date %>% 
+  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+  ggplot(aes(x=1:nrow(.),y=Adj.Close, color=stock_name)) +
+  geom_line()+
+  #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+  #ggtitle("log(Adj.Close)")
+  theme_grey(14)
+
+# 这里有个问题，最好把这几张图竖着排列即6×1，但是grid.arrange结果很奇怪
+p=paste0('p',1:length(dataName))
+i=0
+for(stock_name in dataName){
+  i=i+1
+  tmp_close=cryptos[[paste(stock_name,"_Adj.Close",sep = "")]]
+  tmp_df = data.frame(Adj.Close=tmp_close,Date=cryptos$Date)
+  tmp_plot = ggplot(tmp_df,aes(x=1:nrow(cryptos), y=Adj.Close)) + 
+    geom_line() + 
+    #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+    xlab("date") +
+    ylab("Adj.Close") +
+    ggtitle(stock_name)+
+    theme_bw()
+  assign(p[i], tmp_plot)
+}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2, nrow=3)
+
+#存在一个问题 各个stock的close数量级差别有点大，最好标准化
+# 标准化之后的ridge图意义是在观察close在分位数上的趋势分布
+# 比起普通6条折线在一个图的优点是，他们的纵坐标相差很大会导致
+close_date %>% 
+  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+  #filter(stock_name=="BTC_Adj.Close") %>%
+  ggplot(aes(x=Adj.Close, y=reorder(stock_name, Adj.Close, median))) +
+  geom_density_ridges(rel_min_height = 0.01,fill="blue", alpha=0.5)+
+  scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+  ggtitle("log(Adj.Close)")
+  theme_grey(14)
+```
+
+
+```{r}
+close_scaled=data.frame(scale(close))
+close_date_scaled=data.frame(Date=cryptos$Date,close_scaled)
+
+close_date_scaled %>% 
+  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+  ggplot(aes(x=Date,y=Adj.Close, color=stock_name)) +
+  geom_line()+
+  #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+  #ggtitle("log(Adj.Close)")
+  theme_grey(14)
+
+
+
+```
+
+
+```{r}
+library(ggridges)
+close_date_scaled %>% 
+  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+  #filter(stock_name=="BTC_Adj.Close") %>%
+  ggplot(aes(x=Adj.Close, y=reorder(stock_name, Adj.Close, median))) +
+  geom_density_ridges(fill="blue", alpha=0.5)+
+  #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
+  #ggtitle("log(Adj.Close)")
+  theme_grey(14)
+
+```
+
+```{r}
+library(parcoords)
+parcoords::parcoords(
+  mtcars
+  ,reorderable = TRUE
+  ,brushMode = "2d-strums"
+  , withD3 = TRUE
+)
+```
+
+
+

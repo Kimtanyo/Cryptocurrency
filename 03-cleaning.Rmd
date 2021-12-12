@@ -1,1 +1,78 @@
 # Data transformation
+
+```{r}
+library(stringr)
+library(tidyverse)
+
+dataFileName = list.files("./data")
+for(name in dataFileName){
+  assign(substring(name,1,3), read.csv(str_c("./data/",name)))
+}
+
+dataName = sapply(dataFileName, substring,1,3)
+# names(dataName) is still dataFileName
+names(dataName) = NULL
+
+# get() function can transform string to variable name
+# we can use for loop in dataName and get() to extract data
+# SOL数据有问题 缺失了一部分 直接删掉不要了
+
+stock = get(dataName[1])[,c("Adj.Close","Volume")]
+colnames(stock)[1] = paste(dataName[1],"Adj.Close",sep="_")
+colnames(stock)[2] = paste(dataName[1],"Volume",sep="_")
+for(name in dataName){
+  if(name!=dataName[1]){
+    stock=data.frame(get(name)[,c("Adj.Close","Volume")],stock)
+    colnames(stock)[1] = paste(name,"Adj.Close",sep="_")
+    colnames(stock)[2] = paste(name,"Volume",sep="_")
+  }else{
+    next
+  }
+}
+stock=data.frame(Date=get(dataName[1])[,"Date"],stock)
+```
+
+
+
+```{r}
+# discard rows of missing value 
+missingRows = which(stock[2] == "null")
+stock=stock[-missingRows,]
+stock=as.data.frame(lapply(stock,as.numeric))
+sapply(stock,mode)
+```
+
+```{r}
+library(plyr)
+
+ADA <- data.frame(read.csv(file = './data/ADA-USD.csv')[, c("Date","Adj.Close", "Volume")])
+BTC <- data.frame(read.csv(file = './data/BTC-USD.csv')[, c("Date","Adj.Close", "Volume")])
+DOGE <- data.frame(read.csv(file = './data/DOGE-USD.csv')[, c("Date","Adj.Close", "Volume")])
+ETC <- data.frame(read.csv(file = './data/ETC-USD.csv')[, c("Date","Adj.Close", "Volume")])
+ETH <- data.frame(read.csv(file = './data/ETH-USD.csv')[, c("Date","Adj.Close", "Volume")])
+#SOL <- data.frame(read.csv(file = './data/SOL.csv')[, c("Date","Adj.Close","Volume")])
+XRP <- data.frame(read.csv(file = './data/XRP-USD.csv')[, c("Date","Adj.Close","Volume")])
+
+dataName = c("ADA", "BTC", "DOGE", "ETC", "ETH", "XRP")
+for (name in dataName) {
+  lapply(get(name)[["Adj.Close"]],as.numeric)
+}
+
+names(ADA)[2] <- paste("ADA", "Adj.Close", sep="_")
+names(ADA)[3] <- paste("ADA", "Volume", sep="_")
+names(BTC)[2] <- paste("BTC", "Adj.Close", sep="_")
+names(BTC)[3] <- paste("BTC", "Volume", sep="_")
+names(DOGE)[2] <- paste("DOGE", "Adj.Close", sep="_")
+names(DOGE)[3] <- paste("DOGE", "Volume", sep="_")
+names(ETC)[2] <- paste("ETC", "Adj.Close", sep="_")
+names(ETC)[3] <- paste("ETC", "Volume", sep="_")
+names(ETH)[2] <- paste("ETH", "Adj.Close", sep="_")
+names(ETH)[3] <- paste("ETH", "Volume", sep="_")
+#names(SOL)[2] <- paste("SOL", "Adj.Close", sep="_")
+#names(SOL)[3] <- paste("SOL", "Volume", sep="_")
+names(XRP)[2] <- paste("XRP", "Adj.Close", sep="_")
+names(XRP)[3] <- paste("XRP", "Volume", sep="_")
+
+cryptos <- join_all(list(ADA, BTC, DOGE, ETC, ETH, XRP), by='Date', type='full')
+
+```
