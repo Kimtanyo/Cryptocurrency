@@ -152,7 +152,7 @@ close_date_scaled %>%
 
 
 
-```{r}
+```{r,fig.height=4, fig.width=15}
 library(parcoords)
 library(lubridate)
 
@@ -339,10 +339,13 @@ for(stock_name in dataName){
 grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
 ```
 
+
 ```{r,fig.height=10,fig.width=6}
 # 观察不规则变动remainder的分布，对于不稳定的stock可以用最近一段时期内数据的相关系数较高的其他稳定的stock来辅助建立投资策略
+#例如这里观察到XRP最近不稳定，因此用2020年与其相关系数最大的ETH的走势来预测
 
-# 这里还需要思考一下如何在波峰上面标出pink point来辅助观察pattern
+
+library(data.table)
 
 tmp=as.data.frame(apply(close,c(1,2),BoxCox,lambda=0,simplify = FALSE))
 close_date_trans=data.frame(close_date$Date,tmp)
@@ -355,11 +358,27 @@ for(stock_name in dataName){
   close_date_trans_stl = close_date_trans_ts[,paste(stock_name,"Adj.Close",sep="_")] %>%
     stl(t.window=13, s.window="periodic", robust=TRUE)
   
-  assign(p[i], remainder(close_date_trans_stl) %>% autoplot(main=paste("Remainders of",stock_name, "from STL",sep=" "), ylab="remainders",xlab="date"))
+  remainder_df=data.frame(Date=close_date$Date,Remainder=as.vector(remainder(close_date_trans_stl)))
+  
+  q99=quantile(remainder_df$Remainder,0.99)
+  q1=quantile(remainder_df$Remainder,0.01)
+  
+  tmp = remainder_df %>% filter(Remainder>q99 | Remainder<q1)
+  
+  plot_line = ggplot(remainder_df)+geom_line(mapping=aes(x=Date,y=Remainder))+ xlab("date")+ylab("remainder")+ggtitle(paste("Remainders of",stock_name,"from STL",sep=" "))
+  
+  plot_line_point = plot_line + geom_point(data=tmp, mapping=aes(x=Date,y=Remainder),color="deeppink") + geom_point(data=tmp,mapping=aes(x=Date,y=Remainder),color="deeppink")
+  
+  
+  assign(p[i], plot_line_point)
+
+  
+#remainder(close_date_trans_stl) %>% autoplot(main=paste("Remainders of",stock_name, "from STL",sep=" "), ylab="remainders",xlab="date")
 }
 grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
 
 ```
+
 
 
 
