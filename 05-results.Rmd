@@ -103,7 +103,7 @@ close_date %>%
   geom_line()+
   theme_grey(14)
 
-# 这里有个问题，最好把这几张图竖着排列即6×1，但是grid.arrange结果很奇怪
+
 p=paste0('p',1:length(dataName))
 i=0
 for(stock_name in dataName){
@@ -112,7 +112,6 @@ for(stock_name in dataName){
   tmp_df = data.frame(Adj.Close=tmp_close,Date=cryptos$Date)
   tmp_plot = ggplot(tmp_df,aes(x=Date, y=Adj.Close)) + 
     geom_line() + 
-    #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
     xlab("date") +
     ylab("Adj.Close") +
     ggtitle(stock_name)+
@@ -121,9 +120,7 @@ for(stock_name in dataName){
 }
 grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2, nrow=3)
 
-#存在一个问题 各个stock的close数量级差别有点大，最好标准化
-# 标准化之后的ridge图意义是在观察close在分位数上的趋势分布
-# 比起普通6条折线在一个图的优点是，他们的纵坐标相差很大会导致
+
 ```
 - Here we cannot say directly that which one is more worthy of investing because some stocks are so unstable that we don't know whether the trend will continue in the next few days or months.
 
@@ -287,14 +284,6 @@ corrplot(corr=cor(filter(close_date_scaled,year(Date)==2019)[2:length(close_date
 
 corrplot(corr=cor(filter(close_date_scaled,year(Date)==2020)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey",tl.col = "black",tl.cex = 0.7)
 
-# 每个虚拟货币都有减半的时间点 比如BTC halving最近发生在2020年5月11日 会影响货币股价
-#但是观察前面的无标准化图可以看出其实2020五月份附近波动没有非常剧烈
-#原因是这是大家都能知道的结果 对整个市场在该时间点之前都是已知的信息 无法影响市场
-#print("BTC return during the halving month")
-#return_date[return_date$Date>=as.Date("2020-5-1") & return_date$Date<=as.Date("2020-5-31"),]$BTC_return
-#print("BTC return range during these three years")
-#range(return_date$BTC_return)
-
 ```
 
 - Different from what the monthly data shows in the previous alluvial chart, in terms of 2018, we find the daily data of each stock is highly correlated with each other.
@@ -367,27 +356,12 @@ close_month = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct
 
 close_month_ts<-ts(close_month,frequency=12,start=c(2018,1))
 
-#close_month_stl = close_month_ts[,"ETC_Adj.Close"] %>%
-#  stl(t.window=13, s.window="periodic", robust=TRUE)
-
-#autoplot(close_month_stl)
-
-#fcast=forecast(close_month_stl,method = "naive",h=6)
-#fcast %>% autoplot()
 
 
-#观察两个预测图，二者的区别是乘法预测的置信区间有着和expectation一样的变化趋势（随着forecast value变化，置信区间以相同趋势波动），而加法预测的置信区间的发散更加明显（随着forecast value上升，置信区间上界在上升，下界在下降）
 # Multiplicative Decomposition
 tmp=as.data.frame(apply(close_month[3:length(close_month)],c(1,2),BoxCox,lambda=0,simplify = FALSE))
 close_month_trans=data.frame(close_month[1:2],tmp)
 close_month_trans_ts<-ts(close_month_trans,frequency=12,start=c(2018,1))
-#close_month_trans_stl = close_month_trans_ts[,"ETC_Adj.Close"] %>%
-#  stl(t.window=13, s.window="periodic", robust=TRUE)
-
-#autoplot(close_month_trans_stl)
-
-#fcast=forecast(close_month_trans_stl,method = "naive",h=6)
-#fcast %>% autoplot()
 
 
 
@@ -459,9 +433,6 @@ From 6-month forecasts of each stock, we can draw some conclusions as below.
 Now we check the number of outliers of remainder. For simplicity, we regard those greater than $Q_{99}$ or less than $Q_{1}$ as outliers.
 
 ```{r,fig.height=20,fig.width=6}
-# 观察不规则变动remainder的分布，对于不稳定的stock可以用最近一段时期内数据的相关系数较高的其他稳定的stock来辅助建立投资策略
-#例如这里观察到XRP最近不稳定，因此用2020年与其相关系数最大的ETH的走势来预测
-#,fig.height=10,fig.width=6
 
 library(data.table)
 
