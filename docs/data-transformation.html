@@ -24,7 +24,7 @@
 <meta name="author" content="Candong Chen, Qi Meng" />
 
 
-<meta name="date" content="2021-11-14" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -75,10 +75,25 @@
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
-<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
-<li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
+<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-transformation.html"><a href="data-transformation.html#close-volume"><i class="fa fa-check"></i><b>3.1</b> Close &amp; Volume</a></li>
+<li class="chapter" data-level="3.2" data-path="data-transformation.html"><a href="data-transformation.html#return-standardized-return"><i class="fa fa-check"></i><b>3.2</b> Return &amp; Standardized Return</a></li>
+<li class="chapter" data-level="3.3" data-path="data-transformation.html"><a href="data-transformation.html#monthly-return-and-standardized-monthly-return"><i class="fa fa-check"></i><b>3.3</b> Monthly Return and Standardized Monthly Return</a></li>
+<li class="chapter" data-level="3.4" data-path="data-transformation.html"><a href="data-transformation.html#close-standardized-close"><i class="fa fa-check"></i><b>3.4</b> Close &amp; Standardized Close</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-detection"><i class="fa fa-check"></i><b>4.1</b> Missing Data Pattern Detection</a></li>
+<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-after-removing-sol"><i class="fa fa-check"></i><b>4.2</b> Missing Data Pattern After Removing SOL</a></li>
+<li class="chapter" data-level="4.3" data-path="missing-values.html"><a href="missing-values.html#solution-to-the-missing-data"><i class="fa fa-check"></i><b>4.3</b> Solution to the Missing Data</a></li>
+</ul></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
+<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="interactive-component.html"><a href="interactive-component.html#interactive-standardized-crypto-stocks"><i class="fa fa-check"></i><b>6.1</b> Interactive Standardized Crypto Stocks</a></li>
+<li class="chapter" data-level="6.2" data-path="interactive-component.html"><a href="interactive-component.html#interactive-single-stock"><i class="fa fa-check"></i><b>6.2</b> Interactive Single Stock</a></li>
+</ul></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -101,7 +116,77 @@
             <section class="normal" id="section-">
 <div id="data-transformation" class="section level1" number="3">
 <h1><span class="header-section-number">Chapter 3</span> Data transformation</h1>
+<p>Originally, our team collected seven different cryptocurrency stocks (<code>ADA</code>, <code>BTC</code>, <code>DOGE</code>, <code>ETC</code>, <code>ETH</code>, <code>SOL</code>, <code>XRP</code>). One file for each stock contains the information of stocks, such as <code>Date</code>, <code>Open</code>, <code>High</code>, <code>Low</code>, <code>Close</code>, <code>Adj Close</code> and <code>Volume</code>. After investigating the missing data pattern, as described in the <code>Missing values</code> section, we decided to discard the <code>SOL</code> data in the analysis. In the following discussion, since we won’t be using <code>Close</code> values in the analysis, we called <code>Adj Close</code> to be <code>Close</code> for convenience. There are several different dataframes we used in the later analysis. We will briefly introduce each of them and show the structure of each dataframe.</p>
+<div id="close-volume" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Close &amp; Volume</h2>
+<p>The first dataframe is mainly used to analyze whether there is relationship among <code>Adj Close</code> and <code>Volume</code>of each stock. And we merged these three columns of each stock together in the same data frame by the date. The structure of the dataframe looks like:</p>
+</div>
+<div id="return-standardized-return" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Return &amp; Standardized Return</h2>
+<p>In one of the analysis, the team tried to investigate in the relationship among the stocks in the perspective of their daily return. The daily return was calculated by: <span class="math inline">\(return = (today&#39;s\;close - yesterday&#39;s\;close) / yeterday&#39;s\;close\)</span>. The team performed the analysis on both original return and the standardized return. The original return version looks like:</p>
+<pre><code>## &#39;data.frame&#39;:    1091 obs. of  7 variables:
+##  $ Date      : Date, format: &quot;2018-01-02&quot; &quot;2018-01-03&quot; ...
+##  $ ADA_return: num  0.0539 0.2971 0.0345 -0.1146 0.0276 ...
+##  $ BTC_return: num  1324.9 218.9 398.2 1830.3 97.5 ...
+##  $ DOG_return: num  0.000236 0.000175 0.000324 0.002523 0.002696 ...
+##  $ ETC_return: num  0.7492 -0.0537 1.4546 -0.1185 2.2253 ...
+##  $ ETH_return: num  111.8 78.3 18.2 16.8 44 ...
+##  $ XRP_return: num  0.0899 0.6245 0.0913 -0.1479 0.0453 ...</code></pre>
+<p>In the dataframe with standardized daily return, we standardized the daily return for each stock to perform a better analysis. The only difference compared to the previous dataframe is that for each column except the <code>Year</code> and <code>Month</code> column, we stored the standardized value. The dataframe is as shown below:</p>
+<pre><code>## &#39;data.frame&#39;:    1091 obs. of  7 variables:
+##  $ Date      : Date, format: &quot;2018-01-02&quot; &quot;2018-01-03&quot; ...
+##  $ ADA_return: num  3.16 17.3 2.03 -6.63 1.63 ...
+##  $ BTC_return: num  3.511 0.549 1.029 4.864 0.223 ...
+##  $ DOG_return: num  0.831 0.62 1.136 8.758 9.358 ...
+##  $ ETC_return: num  0.8594 -0.0306 1.6413 -0.1024 2.4956 ...
+##  $ ETH_return: num  4.81 3.368 0.784 0.724 1.892 ...
+##  $ XRP_return: num  1.829 12.472 1.857 -2.905 0.941 ...</code></pre>
+</div>
+<div id="monthly-return-and-standardized-monthly-return" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Monthly Return and Standardized Monthly Return</h2>
+<p>The team tried to perform the analysis on monthly basis. In order to achieve the analysis, the set of dataframes with <code>Year</code>, <code>Month</code>, <code>Monthly Average Close</code> and the <code>Standardized Month Average Close</code> are used. The columns are as shown below:</p>
+<pre><code>## tibble [36 × 8] (S3: tbl_df/tbl/data.frame)
+##  $ Year          : Factor w/ 3 levels &quot;2018&quot;,&quot;2019&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Month         : Ord.factor w/ 12 levels &quot;Jan&quot;&lt;&quot;Feb&quot;&lt;&quot;Mar&quot;&lt;..: 1 2 3 4 5 6 7 8 9 10 ...
+##  $ ADA_Adj.Close : num [1:36] 0.747 0.373 0.211 0.233 0.269 ...
+##  $ BTC_Adj.Close : num [1:36] 13086 9472 9041 8034 8451 ...
+##  $ DOGE_Adj.Close: num [1:36] 0.00958 0.00574 0.00389 0.0043 0.00432 ...
+##  $ ETC_Adj.Close : num [1:36] 33.6 30.3 20.6 17 18.5 ...
+##  $ ETH_Adj.Close : num [1:36] 1104 873 626 521 679 ...
+##  $ XRP_Adj.Close : num [1:36] 1.877 0.978 0.736 0.682 0.717 ...</code></pre>
+<p>In the dataframe with standardized monthly closes, we standardized the monthly average prices for each stock to perform a better analysis. The structure of the previous dataframe looks almost the same as the second one. The only difference is that for each column except the <code>Year</code> and <code>Month</code> column, we store the standardized value instead of the originally monthly price. The dataframe is as shown below:</p>
+<pre><code>## tibble [36 × 8] (S3: tbl_df/tbl/data.frame)
+##  $ Year          : Factor w/ 3 levels &quot;2018&quot;,&quot;2019&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Month         : Ord.factor w/ 12 levels &quot;Jan&quot;&lt;&quot;Feb&quot;&lt;&quot;Mar&quot;&lt;..: 1 2 3 4 5 6 7 8 9 10 ...
+##  $ ADA_Adj.Close : num [1:36] 4.677 1.896 0.695 0.855 1.128 ...
+##  $ BTC_Adj.Close : num [1:36] 1.1974 0.2128 0.0952 -0.1792 -0.0654 ...
+##  $ DOGE_Adj.Close: num [1:36] 4.014 1.594 0.424 0.679 0.696 ...
+##  $ ETC_Adj.Close : num [1:36] 3.33 2.88 1.53 1.04 1.25 ...
+##  $ ETH_Adj.Close : num [1:36] 3.381 2.381 1.308 0.854 1.538 ...
+##  $ XRP_Adj.Close : num [1:36] 4.416 1.704 0.976 0.813 0.92 ...</code></pre>
+</div>
+<div id="close-standardized-close" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Close &amp; Standardized Close</h2>
+<p>The last set of dataframes we used is quite simple. We include the date and the closing prices for each stock in one data frame. The structure looks like:</p>
+<pre><code>## &#39;data.frame&#39;:    1092 obs. of  7 variables:
+##  $ Date          : Date, format: &quot;2018-01-01&quot; &quot;2018-01-02&quot; ...
+##  $ ADA_Adj.Close : num  0.729 0.783 1.08 1.114 1 ...
+##  $ BTC_Adj.Close : num  13657 14982 15201 15599 17430 ...
+##  $ DOGE_Adj.Close: num  0.00891 0.00915 0.00932 0.00964 0.01217 ...
+##  $ ETC_Adj.Close : num  34.2 34.9 34.9 36.3 36.2 ...
+##  $ ETH_Adj.Close : num  773 884 963 981 998 ...
+##  $ XRP_Adj.Close : num  2.39 2.48 3.11 3.2 3.05 ...</code></pre>
+<p>In the dataframe with standardized close, instead of containing the original stock prices, we standardized the prices for each stock to perform a better analysis. The structure of the last dataframe looks almost the same as the second one. The only difference is that for each column except the <code>Date</code> column, we store the standardized value instead of the originally price. The dataframe is as shown below:</p>
+<pre><code>## &#39;data.frame&#39;:    1092 obs. of  7 variables:
+##  $ Date          : Date, format: &quot;2018-01-01&quot; &quot;2018-01-02&quot; ...
+##  $ ADA_Adj.Close : num  4.54 4.94 7.15 7.4 6.55 ...
+##  $ BTC_Adj.Close : num  1.35 1.71 1.77 1.88 2.38 ...
+##  $ DOGE_Adj.Close: num  3.59 3.74 3.85 4.06 5.65 ...
+##  $ ETC_Adj.Close : num  3.42 3.52 3.51 3.71 3.7 ...
+##  $ ETH_Adj.Close : num  1.94 2.43 2.77 2.85 2.92 ...
+##  $ XRP_Adj.Close : num  5.96 6.23 8.12 8.39 7.95 ...</code></pre>
 
+</div>
 </div>
             </section>
 
@@ -163,6 +248,20 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>
