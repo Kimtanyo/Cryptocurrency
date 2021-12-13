@@ -7,3 +7,12 @@ site: bookdown::bookdown_site
 
 # Introduction
 
+Cryptocurrency is a collection of binary data which is used for people to trade as a medium instead of physical form like paper money. In other words, it's a tradable digital asset. Cryptocurrency utilizes the idea of blockchain to secure the transactions. Currently, cryptocurrencies are widely adopted in many types of trading and they are also hit trends for people to invest. Even some celebrities would publicly share their opinion and their investment experience about the cryptocurrency. The most well-known example is Elon Musk, who supports Dogecoin in Twitter and it results in the soaring 20% of Dogecoin's price. In recent years, the prices of cryptocurrencies, such as Bitcoin, Ethereum and Dogecoin, shoot up dramatically, which is also another sign that the cryptocurreny market is trending. Nowadays, there are more than 6 thousands types of cryptocurrencies available in the market. 
+
+Base on the information above, our team aims to investigate in the cryptocurrency market in this project. We hope to gain some insights from the market by visualizing their stock data using R. In this project, we select seven types of popular cryptocurrencies stocks, which have large "market cup" (calcualted by multiplying the price by the number of coins in circulation), in our analysis. The chosen cryptocurrencies are Bitcoin, Cardano, Dogecoin, EthereumClassic, Ethereum, ReneSola and XRP. By analyzing the stock prices for the chosen cryptos, we hope to answer the following questions:
+
+*    Can we make use of features of data to establish a portfolio based on these cryptocurrencies’ stocks?
+*    When is a good time for investors to invest these cryptocurrencies and potentially gain the largest benefit?
+*    Which one of these cryptocurrencies is still worth investing in the future?
+
+In the following chapters, we will try to gain some insights from the visualization of the data. And we hope to use the insights to find the answer of the above questions.

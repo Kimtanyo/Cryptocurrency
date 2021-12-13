@@ -1,1 +1,230 @@
 # Missing values
+
+```{r}
+library(plyr)
+library(tidyverse)
+library(patchwork)
+```
+
+
+```{r}
+ADA <- data.frame(read.csv(file = './data/ADA-USD.csv')[, c("Date","Adj.Close", "Volume")])
+BTC <- data.frame(read.csv(file = './data/BTC-USD.csv')[, c("Date","Adj.Close", "Volume")])
+DOGE <- data.frame(read.csv(file = './data/DOGE-USD.csv')[, c("Date","Adj.Close", "Volume")])
+ETC <- data.frame(read.csv(file = './data/ETC-USD.csv')[, c("Date","Adj.Close", "Volume")])
+ETH <- data.frame(read.csv(file = './data/ETH-USD.csv')[, c("Date","Adj.Close", "Volume")])
+SOL <- data.frame(read.csv(file = './data/SOL.csv')[, c("Date","Adj.Close","Volume")])
+XRP <- data.frame(read.csv(file = './data/XRP-USD.csv')[, c("Date","Adj.Close","Volume")])
+
+dataName = c("ADA", "BTC", "DOGE", "ETC", "ETH", "SOL", "XRP")
+for (name in dataName) {
+  lapply(get(name)[["Adj.Close"]],as.numeric)
+}
+
+names(ADA)[2] <- paste("ADA", "Adj.Close", sep="_")
+names(ADA)[3] <- paste("ADA", "Volume", sep="_")
+names(BTC)[2] <- paste("BTC", "Adj.Close", sep="_")
+names(BTC)[3] <- paste("BTC", "Volume", sep="_")
+names(DOGE)[2] <- paste("DOGE", "Adj.Close", sep="_")
+names(DOGE)[3] <- paste("DOGE", "Volume", sep="_")
+names(ETC)[2] <- paste("ETC", "Adj.Close", sep="_")
+names(ETC)[3] <- paste("ETC", "Volume", sep="_")
+names(ETH)[2] <- paste("ETH", "Adj.Close", sep="_")
+names(ETH)[3] <- paste("ETH", "Volume", sep="_")
+names(SOL)[2] <- paste("SOL", "Adj.Close", sep="_")
+names(SOL)[3] <- paste("SOL", "Volume", sep="_")
+names(XRP)[2] <- paste("XRP", "Adj.Close", sep="_")
+names(XRP)[3] <- paste("XRP", "Volume", sep="_")
+
+cryptos <- join_all(list(ADA, BTC, DOGE, ETC, ETH, SOL, XRP), by='Date', type='full')
+```
+
+Our teams want to analyze the cryptocurrency market by analyzing seven chosen cryptos with large market cups. We aim to have seven stocks data within same range of date. We expected the seven stocks would all have data on each date when the stock market operates. In order to verify it, we performed the missing data pattern analysis. The result shows that there exists some missing data patterns in the stocks. The team investigated the patterns and gave the solution as described below.
+
+
+## Missing Data Pattern Detection
+```{r}
+plot_missing = function(mycars, percent = FALSE){
+  missing_patterns <- data.frame(is.na(mycars)) %>%
+  group_by_all() %>%
+  count(name = "count", sort = TRUE) %>%
+  ungroup()
+  
+  for(i in colnames(missing_patterns)){
+    if(i != "count"){
+    missing_patterns[[i]]=as.integer(as.logical(missing_patterns[[i]]))
+    }
+  }
+  missing_patterns$alphaType=rowSums(missing_patterns[1:ncol(missing_patterns)-1])
+  
+  
+  for (col in colnames(missing_patterns)){
+    if(col != "count" & col != "alphaType"){
+      for (row in rownames(missing_patterns)){
+        if (missing_patterns[row,"alphaType"]==0){
+          missing_patterns[row,col]=2
+        }
+      }
+    }
+  }
+  
+  for (col in colnames(missing_patterns)){
+    if (col != "count" & col != "alphaType"){
+      missing_patterns[[col]]=factor(missing_patterns[[col]])
+    }
+  }
+  
+  
+  
+  if(percent==FALSE){
+    tmp = tibble(x=factor(names(mycars)),y=colSums(is.na(mycars)))
+    miny = floor(min(tmp$y))
+    maxy = ceiling(max(tmp$y))
+    plot3 = tmp  %>%
+      ggplot(aes(fct_reorder(x,y,.desc = TRUE),y)) + 
+      geom_bar(stat="identity",fill="#6495EC",alpha=0.7) + 
+      scale_y_continuous(breaks=seq(miny,maxy,by=10)) +
+      ylab("num rows\nmissing") +
+      theme_bw()+
+      theme(axis.title.x=element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    
+    df = missing_patterns %>% 
+      mutate(pattern=factor(c(nrow(missing_patterns):1)))
+    df2 = df %>% gather(key = "var", value = "missing", -c(count,pattern,alphaType))
+    df2$missing = factor(df2$missing, levels=c("0","1","2"))
+    
+    for(row in rownames(df)){
+      if (df[row,"alphaType"]==0){
+        annotateNum=as.numeric(df[row,"pattern"])
+      }
+    }
+    
+    
+    plot1 = df2 %>%
+      ggplot(aes(x=factor(var,levels = levels(fct_reorder(tmp$x,tmp$y,.desc = TRUE))), y=pattern, fill=missing)) +
+      geom_tile(color="white")+
+      scale_fill_manual(values=c("grey","#B59FE6","#787A76"),guide="none")+
+      scale_alpha_manual(values=c(alpha("grey",0.5),alpha("#B59FE6",0.8),alpha("#787A76",0.5))) + 
+      annotate("text", x=ceiling(ncol(mycars)/2), y=ceiling(annotateNum), label="complete cases")+
+      xlab("variable")+
+      ylab("missing pattern")+
+      theme_bw()+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    
+    df$alphaType2=factor(ifelse(df$alphaType==0, 0, 1), levels=c("0","1"))
+    
+    plot2 = df %>%
+      ggplot(aes(x=pattern,y=count,fill=alphaType2)) +
+      geom_bar(stat="identity") + 
+      scale_fill_manual(values=c("#608fE0","#7DADFF"),guide="none")+
+      scale_alpha_manual(values=c(alpha("#608fE0",0.9),alpha("#7DADFF",0.5))) +
+      coord_flip() + xlab("row count")+
+      theme_bw()+
+      theme(axis.title.y=element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    
+    
+    layout <- "
+    CCCC#
+    AAAAB
+    AAAAB
+    AAAAB
+    "
+    
+    return(plot1 + plot2 + plot3 + plot_layout(design = layout))
+  }
+  if(percent==TRUE){
+    tmp = tibble(x=factor(names(mycars)),y=colSums(is.na(mycars)))
+    tmp = mutate(tmp, percent = y/nrow(mycars) *100)
+    
+    plot3 = tmp  %>%
+      ggplot(aes(fct_reorder(x,y,.desc = TRUE),percent)) + 
+      geom_bar(stat="identity",fill="#6495EC",alpha=0.7) + 
+      scale_y_continuous(limits=c(0, 100),breaks=seq(0,100,by=25)) +
+      ylab("% rows\nmissing") +
+      theme_bw()+
+      theme(axis.title.x=element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    
+    df = missing_patterns %>% 
+      mutate(pattern=factor(c(nrow(missing_patterns):1)))
+    df2 = df %>% gather(key = "var", value = "missing", -c(count,pattern,alphaType))
+    df2$missing = factor(df2$missing, levels=c("0","1","2"))
+    
+    for(row in rownames(df)){
+      if (df[row,"alphaType"]==0){
+        annotateNum=as.numeric(df[row,"pattern"])
+      }
+    }
+    
+    
+    plot1 = df2 %>%
+      ggplot(aes(x=factor(var,levels = levels(fct_reorder(tmp$x,tmp$y,.desc = TRUE))), y=pattern, fill=missing)) +
+      geom_tile(color="white")+
+      scale_fill_manual(values=c("grey","#B59FE6","#787A76"),guide="none")+
+      scale_alpha_manual(values=c(alpha("grey",0.5),alpha("#B59FE6",0.8),alpha("#787A76",0.5))) + 
+      annotate("text", x=ceiling(ncol(mycars)/2), y=ceiling(annotateNum), label="complete cases")+
+      xlab("variable")+
+      ylab("missing pattern")+
+      theme_bw()+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    
+    df = mutate(df, percent=count/sum(count)*100)
+    df$alphaType2=factor(ifelse(df$alphaType==0, 0, 1), levels=c("0","1"))
+    
+    plot2 = df %>%
+      ggplot(aes(x=pattern,y=percent,fill=alphaType2)) +
+      geom_bar(stat="identity") + 
+      scale_fill_manual(values=c("#608fE0","#7DADFF"),guide="none")+
+      scale_alpha_manual(values=c(alpha("#608fE0",0.9),alpha("#7DADFF",0.5))) +
+      coord_flip() + ylab("% rows")+
+      scale_y_continuous(limits=c(0, 100),breaks=seq(0,100,by=25)) +
+      theme_bw()+
+      theme(axis.title.y=element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    
+    
+    layout <- "
+    CCCC#
+    AAAAB
+    AAAAB
+    AAAAB
+    "
+    return(plot1 + plot2 + plot3 + plot_layout(design = layout))    
+  }
+}
+```
+
+```{r}
+plot_missing(cryptos, percent = TRUE)
+```
+
+By inspecting the plots above, we can notice that there exists some missing data patterns among the seven crypto stocks. The plot shows that there are two types of patterns. The first pattern shows that `SOL` crypto has some entries which other cryptos don't have. Meanwhile, the other pattern indicates that there are missing entries which happen only on `SOL` crypto. It looks like `SOL`'s data is not consistent with other cryptos on the dates. However, other six cryptos seems to have consistent data. To gain more information about it, we looked at the number of `null` data for each column as shown below.
+
+```{r}
+sapply(cryptos, function(x) sum(is.na(x)))
+```
+
+The result shows that `SOL` has missing data on 341 rows while other cryptos all have 4 rows of missing data. Our team has the rough conclusion that `SOL` has inconsistant data with other cryptos. We verify the thought by removing the `SOL` related columns in the table and perform the analysis above again.
+
+## Missing Data Pattern After Removing SOL
+
+We now join the stock data of the chosen cryptos except `SOL`. And we plot the missing data pattern plot and the number of missing data rows again. 
+```{r}
+cryptos <- join_all(list(ADA, BTC, DOGE, ETC, ETH, XRP), by='Date', type='full')
+plot_missing(cryptos, percent = TRUE)
+```
+
+```{r}
+sapply(cryptos, function(x) sum(is.na(x)))
+```
+
+The results above show that the there isn't any missing data now after removing the `SOL` stock data. It verifies our thought that `SOL` doesn't have consistent data with other cryptos, while the rest of the six cryptos remain consistent.
+
+## Solution to the Missing Data
+
+Since the team aims to investigate the cryptocurrency market within a selected range of date, the data consistency is a crucial requirement in the project, especially when we need to involved the time feature in the analysis. Considering `SOL` is less popular among the seven chosen cryptos, after discussion, our team decided to remove `SOL` from the dataset in this project. Thus, the following analysis would be based on `ADA`, `BTC`, `DOGE`, `ETC`, `ETH`, `XRP` only. 
+
+```{r}
+tmp = data.frame(read.csv(file = './data/interactive.csv')[, c("ADA", "BTC", "DOGE", "ETC", "ETH", "XRP")])
+close_scaled=data.frame(scale(tmp))
+close_date_scaled=data.frame(Date=cryptos$Date,close_scaled)
+write.csv(close_date_scaled, './data/iteractive_v2.csv')
+```
