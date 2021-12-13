@@ -3,46 +3,6 @@
 ```{r}
 library(stringr)
 library(tidyverse)
-
-dataFileName = list.files("./data")
-for(name in dataFileName){
-  assign(substring(name,1,3), read.csv(str_c("./data/",name)))
-}
-
-dataName = sapply(dataFileName, substring,1,3)
-# names(dataName) is still dataFileName
-names(dataName) = NULL
-
-# get() function can transform string to variable name
-# we can use for loop in dataName and get() to extract data
-# SOL数据有问题 缺失了一部分 直接删掉不要了
-
-stock = get(dataName[1])[,c("Adj.Close","Volume")]
-colnames(stock)[1] = paste(dataName[1],"Adj.Close",sep="_")
-colnames(stock)[2] = paste(dataName[1],"Volume",sep="_")
-for(name in dataName){
-  if(name!=dataName[1]){
-    stock=data.frame(get(name)[,c("Adj.Close","Volume")],stock)
-    colnames(stock)[1] = paste(name,"Adj.Close",sep="_")
-    colnames(stock)[2] = paste(name,"Volume",sep="_")
-  }else{
-    next
-  }
-}
-stock=data.frame(Date=get(dataName[1])[,"Date"],stock)
-```
-
-
-
-```{r}
-# discard rows of missing value 
-missingRows = which(stock[2] == "null")
-stock=stock[-missingRows,]
-stock=as.data.frame(lapply(stock,as.numeric))
-sapply(stock,mode)
-```
-
-```{r}
 library(plyr)
 
 ADA <- data.frame(read.csv(file = './data/ADA-USD.csv')[, c("Date","Adj.Close", "Volume")])
