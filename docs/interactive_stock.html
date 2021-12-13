@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v7.js"></script>
+    <style type ="text/css">
+        body {
+        font: 10px sans-serif;
+        }
+        
+        #fm1{
+            font: 20px sans-serif;
+        }
+
+        .lineADA {
+            fill: none;
+            stroke: blue;
+            stroke-width: 2.0px;
+        }
+
+        .lineBTC {
+            fill: none;
+            stroke: orange;
+            stroke-width: 2.0px;
+        }
+
+        .lineDOGE {
+            fill: none;
+            stroke: green;
+            stroke-width: 2.0px;
+        }
+
+        .lineETC {
+            fill: none;
+            stroke: red;
+            stroke-width: 2.0px;
+        }
+
+        .lineETH {
+            fill: none;
+            stroke: purple;
+            stroke-width: 2.0px;
+        }
+
+        .lineXRP {
+            fill: none;
+            stroke: sienna;
+            stroke-width: 2.0px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <svg width="800" height="600">
+        <rect id="ADA" x="150" y="120" width=40 height=30 fill="lightblue"></rect>
+        <rect id="BTC" x="200" y="120" width=40 height=30 fill="lightsalmon"></rect>
+        <rect id="DOGE" x="250" y="120" width=40 height=30 fill="lightgreen"></rect>
+        <rect id="ETC" x="300" y="120" width=40 height=30 fill="lightcoral"></rect>
+        <rect id="ETH" x="350" y="120" width=40 height=30 fill="lavender"></rect>
+        <rect id="XRP" x="400" y="120" width=40 height=30 fill="sandybrown"></rect>
+
+        <text id="fm1" x="210" y="80"> Stock of Cryptocurrency </text>
+        <text x="160" y="140"> ADA </text>
+        <text x="210" y="140"> BTC </text>
+        <text x="255" y="140"> DOGE </text>
+        <text x="310" y="140"> ETC </text>
+        <text x="360" y="140"> ETH </text>
+        <text x="410" y="140"> XRP </text>
+
+    <script>
+        var svg = d3.select("svg");
+        var margin = {
+            top: 20,
+            right: 80,
+            bottom: 30,
+            left: 50
+        },
+        width = 800 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+        var g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        var parseDate = d3.timeParse('%Y-%m-%d');
+        var xScale = d3.scaleTime().range([0, width]);
+
+        d3.csv("https://raw.githubusercontent.com/Kimtanyo/Cryptocurrency/main/data/interactive.csv").then(function(data) 
+        {
+        
+        data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        });
+
+        var ADAdata = data.map(function(d) {
+            return {
+              date: d.date,
+              ADA: d.ADA
+            }
+          });
+        var BTCdata = data.map(function(d) {
+        return {
+            date: d.date,
+            BTC: d.BTC
+        }
+        });
+        var DOGEdata = data.map(function(d) {
+            return {
+              date: d.date,
+              DOGE: d.DOGE
+            }
+          });
+        var ETCdata = data.map(function(d) {
+            return {
+              date: d.date,
+              ETC: d.ETC
+            }
+          });
+        var ETHdata = data.map(function(d) {
+        return {
+            date: d.date,
+            ETH: d.ETH
+        }
+        });
+        var XRPdata = data.map(function(d) {
+            return {
+              date: d.date,
+              XRP: d.XRP
+            }
+          });
+
+        xScale.domain(d3.extent(BTCdata, d => d.date));
+
+        g.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale).ticks(18));
+
+        
+        var adaYScale = d3.scaleLinear()
+        .domain([
+        d3.min(ADAdata, function(c) {
+            return c.ADA
+        }),
+        d3.max(ADAdata, function(c) {
+            return c.ADA
+        })
+        ])
+        .range([height, 0]);
+
+        var adaline = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => adaYScale(d.ADA));
+
+        var btcYScale = d3.scaleLinear()
+        .domain([3000, 30000])
+        .range([height, 0]);
+
+        var btcline = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => btcYScale(d.BTC));
+
+        var dogeYScale = d3.scaleLinear()
+        .domain([
+        d3.min(DOGEdata, function(c) {
+            return c.DOGE
+        }),
+        d3.max(DOGEdata, function(c) {
+            return c.DOGE
+        })
+        ])
+        .range([height, 0]);
+
+        var dogeline = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => dogeYScale(d.DOGE));
+
+        var etcYScale = d3.scaleLinear()
+        .domain([0, 50])
+        .range([height, 0]);
+
+        var etcline = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => etcYScale(d.ETC));
+
+        var ethYScale = d3.scaleLinear()
+        .domain([80, 1500])
+        .range([height, 0]);
+
+        var ethline = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => ethYScale(d.ETH));
+
+        var xrpYScale = d3.scaleLinear()
+        .domain([
+        d3.min(XRPdata, function(c) {
+            return c.XRP
+        }),
+        d3.max(XRPdata, function(c) {
+            return c.XRP
+        })
+        ])
+        .range([height, 0]);
+
+        var xrpline = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => xrpYScale(d.XRP));
+
+        svg.select("#ADA").on("click", function() {
+            d3.select(".yaxis").remove();
+            d3.select(".lineADA").remove();
+            d3.select(".lineBTC").remove();
+            d3.select(".lineDOGE").remove();
+            d3.select(".lineETC").remove();
+            d3.select(".lineETH").remove();
+            d3.select(".lineXRP").remove();
+
+            g.append("g")
+            .attr("class", "yaxis")
+            .call(d3.axisLeft(adaYScale));
+
+            g.append("path")
+            .datum(ADAdata)
+            .attr("class", "lineADA")
+            .attr("fill", "none")
+            .attr("d", adaline);
+
+            let totalLengthADA = svg.select('.lineADA').node().getTotalLength();
+
+            svg.select('.lineADA')
+            .attr("stroke-dasharray", totalLengthADA + " " + totalLengthADA)
+            .attr("stroke-dashoffset", totalLengthADA)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
+        });
+
+        svg.select("#BTC").on("click", function() {
+            d3.select(".yaxis").remove();
+            d3.select(".lineADA").remove();
+            d3.select(".lineBTC").remove();
+            d3.select(".lineDOGE").remove();
+            d3.select(".lineETC").remove();
+            d3.select(".lineETH").remove();
+            d3.select(".lineXRP").remove();
+
+            g.append("g")
+            .attr("class", "yaxis")
+            .call(d3.axisLeft(btcYScale));
+
+            g.append("path")
+            .datum(BTCdata)
+            .attr("class", "lineBTC")
+            .attr("fill", "none")
+            .attr("d", btcline);
+
+            let totalLengthBTC = svg.select('.lineBTC').node().getTotalLength();
+
+            svg.select('.lineBTC')
+            .attr("stroke-dasharray", totalLengthBTC + " " + totalLengthBTC)
+            .attr("stroke-dashoffset", totalLengthBTC)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
+        });
+
+        svg.select("#DOGE").on("click", function() {
+            d3.select(".yaxis").remove();
+            d3.select(".lineADA").remove();
+            d3.select(".lineBTC").remove();
+            d3.select(".lineDOGE").remove();
+            d3.select(".lineETC").remove();
+            d3.select(".lineETH").remove();
+            d3.select(".lineXRP").remove();
+
+            g.append("g")
+            .attr("class", "yaxis")
+            .call(d3.axisLeft(dogeYScale));
+
+            g.append("path")
+            .datum(DOGEdata)
+            .attr("class", "lineDOGE")
+            .attr("fill", "none")
+            .attr("d", dogeline);
+
+            let totalLengthDOGE = svg.select('.lineDOGE').node().getTotalLength()
+
+            svg.select('.lineDOGE')
+            .attr("stroke-dasharray", totalLengthDOGE + " " + totalLengthDOGE)
+            .attr("stroke-dashoffset", totalLengthDOGE)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
+        });
+
+        svg.select("#ETC").on("click", function() {
+            d3.select(".yaxis").remove();
+            d3.select(".lineADA").remove();
+            d3.select(".lineBTC").remove();
+            d3.select(".lineDOGE").remove();
+            d3.select(".lineETC").remove();
+            d3.select(".lineETH").remove();
+            d3.select(".lineXRP").remove();
+
+            g.append("g")
+            .attr("class", "yaxis")
+            .call(d3.axisLeft(etcYScale));
+
+            g.append("path")
+            .datum(ETCdata)
+            .attr("class", "lineETC")
+            .attr("fill", "none")
+            .attr("d", etcline);
+
+            let totalLengthETC = svg.select('.lineETC').node().getTotalLength();
+            
+            svg.select('.lineETC')
+            .attr("stroke-dasharray", totalLengthETC + " " + totalLengthETC)
+            .attr("stroke-dashoffset", totalLengthETC)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
+        });
+
+        svg.select("#ETH").on("click", function() {
+            d3.select(".yaxis").remove();
+            d3.select(".lineADA").remove();
+            d3.select(".lineBTC").remove();
+            d3.select(".lineDOGE").remove();
+            d3.select(".lineETC").remove();
+            d3.select(".lineETH").remove();
+            d3.select(".lineXRP").remove();
+
+            g.append("g")
+            .attr("class", "yaxis")
+            .call(d3.axisLeft(ethYScale));
+
+            g.append("path")
+            .datum(ETHdata)
+            .attr("class", "lineETH")
+            .attr("fill", "none")
+            .attr("d", ethline);
+
+            let totalLengthETH = svg.select('.lineETH').node().getTotalLength();
+
+            svg.select('.lineETH')
+            .attr("stroke-dasharray", totalLengthETH + " " + totalLengthETH)
+            .attr("stroke-dashoffset", totalLengthETH)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
+        });
+
+        svg.select("#XRP").on("click", function() {
+            d3.select(".yaxis").remove();
+            d3.select(".lineADA").remove();
+            d3.select(".lineBTC").remove();
+            d3.select(".lineDOGE").remove();
+            d3.select(".lineETC").remove();
+            d3.select(".lineETH").remove();
+            d3.select(".lineXRP").remove();
+
+            g.append("g")
+            .attr("class", "yaxis")
+            .call(d3.axisLeft(xrpYScale));
+
+            g.append("path")
+            .datum(XRPdata)
+            .attr("class", "lineXRP")
+            .attr("fill", "none")
+            .attr("d", xrpline);
+
+            let totalLengthXRP = svg.select('.lineXRP').node().getTotalLength();
+
+            svg.select('.lineXRP')
+            .attr("stroke-dasharray", totalLengthXRP + " " + totalLengthXRP)
+            .attr("stroke-dashoffset", totalLengthXRP)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
+        });
+
+        }); 
+        
+    </script>
+</body>
+
+</html>
+
