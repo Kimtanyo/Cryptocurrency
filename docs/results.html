@@ -24,7 +24,7 @@
 <meta name="author" content="Candong Chen, Qi Meng" />
 
 
-<meta name="date" content="2021-12-12" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -81,7 +81,29 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
-<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#distribution-and-dependency-of-closing-price"><i class="fa fa-check"></i><b>5.1</b> Distribution and Dependency of Closing Price</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="results.html"><a href="results.html#color-palette"><i class="fa fa-check"></i><b>5.1.1</b> Color Palette</a></li>
+<li class="chapter" data-level="5.1.2" data-path="results.html"><a href="results.html#dependency-between-volume-and-closing-price"><i class="fa fa-check"></i><b>5.1.2</b> Dependency between Volume and Closing price</a></li>
+<li class="chapter" data-level="5.1.3" data-path="results.html"><a href="results.html#distribution-of-closing-price"><i class="fa fa-check"></i><b>5.1.3</b> Distribution of Closing Price</a></li>
+<li class="chapter" data-level="5.1.4" data-path="results.html"><a href="results.html#distribution-of-scaled-closing-price"><i class="fa fa-check"></i><b>5.1.4</b> Distribution of Scaled Closing Price</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#correlation-between-pairs-of-stocks"><i class="fa fa-check"></i><b>5.2</b> Correlation between pairs of stocks</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="results.html"><a href="results.html#correlation-analysis"><i class="fa fa-check"></i><b>5.2.1</b> Correlation Analysis</a></li>
+<li class="chapter" data-level="5.2.2" data-path="results.html"><a href="results.html#correlation-coefficient"><i class="fa fa-check"></i><b>5.2.2</b> Correlation Coefficient</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#time-series"><i class="fa fa-check"></i><b>5.3</b> Time Series</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="results.html"><a href="results.html#loess-smooth"><i class="fa fa-check"></i><b>5.3.1</b> Loess Smooth</a></li>
+<li class="chapter" data-level="5.3.2" data-path="results.html"><a href="results.html#stl-decomposition-of-btc"><i class="fa fa-check"></i><b>5.3.2</b> STL Decomposition of BTC</a></li>
+<li class="chapter" data-level="5.3.3" data-path="results.html"><a href="results.html#decomposition-over-monthly-data"><i class="fa fa-check"></i><b>5.3.3</b> Decomposition over Monthly Data</a></li>
+<li class="chapter" data-level="5.3.4" data-path="results.html"><a href="results.html#forecasts-from-stl"><i class="fa fa-check"></i><b>5.3.4</b> Forecasts from STL</a></li>
+<li class="chapter" data-level="5.3.5" data-path="results.html"><a href="results.html#remainder-analysis"><i class="fa fa-check"></i><b>5.3.5</b> Remainder Analysis</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
@@ -105,32 +127,152 @@
             <section class="normal" id="section-">
 <div id="results" class="section level1" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Results</h1>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-10-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<div id="distribution-and-dependency-of-closing-price" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Distribution and Dependency of Closing Price</h2>
+<div id="color-palette" class="section level3" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> Color Palette</h3>
+<p>We choose qualitative color palette to highlight visual differences between cryptocurrencies. Here we choose “Set2” in RColorBrewer.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="dependency-between-volume-and-closing-price" class="section level3" number="5.1.2">
+<h3><span class="header-section-number">5.1.2</span> Dependency between Volume and Closing price</h3>
+<p>We try to find out if there is any dependency between volume and closing price so that we can combine them together to analyze later. The y-axis is limited by the difference of orders of magnitude between volume of each kind of cryptocurrency stock. Therefore, we have to split the figure of 6 lines to 6 figures as below.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+Note that the magnitude of volume is so large that almost all points gather at the lower left corner and we use <code>log(Volume)</code> instead of <code>Volume</code>.</p>
+<p>We can draw some conclusions below.</p>
+<ul>
+<li><p>Closing prices of each stock is independent of volumes of that because most points of each figure are distributed on a horizontal line respectively.</p></li>
+<li><p>Some stocks like ADA, DOGE and XRP, have similar outlier pattern. We should research their correlation later.</p></li>
+</ul>
+<p>Now We should drop volumes and only concentrate on closing prices.</p>
+</div>
+<div id="distribution-of-closing-price" class="section level3" number="5.1.3">
+<h3><span class="header-section-number">5.1.3</span> Distribution of Closing Price</h3>
+<p>First we want to research the changes of each stock over date. Limited by different magnitudes, we still have to draw 6 figures respectively.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-10-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-10-2.png" width="672" />
+- Here we cannot say directly that which one is more worthy of investing because some stocks are so unstable that we don’t know whether the trend will continue in the next few days or months.</p>
+<ul>
+<li>From these figures above, we find that some stocks have similar distribution within a period of time (e.g. ADA and DOGE in 2020), which inspires us that we can suppose trends of some relatively stable stocks will continue for a period of time and use their trends to help to predict the future trend of some unstable stocks. It’s further researched in the part of time series analysis.</li>
+</ul>
+</div>
+<div id="distribution-of-scaled-closing-price" class="section level3" number="5.1.4">
+<h3><span class="header-section-number">5.1.4</span> Distribution of Scaled Closing Price</h3>
+<p>Considering finite funds of investors, some rising stocks like BTC seem currently promising but their prices are much higher than others too, which means that investors need to put more money first. Thus, we standardize all closing prices of each stock and draw a joint line chart and ridge line chart so that we can eliminate the effect of magnitude.</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Here we can draw some conclusions.</p>
+<ul>
+<li><p>BTC has three cluster center where a large number of standardized prices gather. It implies that BTC is unstable and the most difficult one to predict.</p></li>
+<li><p>However, BTC has extremely rising tendency which seems likely to return to the level of the beginning of 2018, so speculators may take the risk of stopping rising and a sharp decline to invest on it. At least a short-term investment on BTC is plausible.</p></li>
+</ul>
+</div>
+</div>
+<div id="correlation-between-pairs-of-stocks" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Correlation between pairs of stocks</h2>
+<div id="correlation-analysis" class="section level3" number="5.2.1">
+<h3><span class="header-section-number">5.2.1</span> Correlation Analysis</h3>
+<p>To solve unstability, we can research on correlation to use highly correlated stocks to help to predict. Thus, we first draw a matrix of scatterplots of closing prices of each stock to have a preliminary exploration on the correlation pattern. Then we draw a alluvial chart and a parallel coordinates chart.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>From the matrix of scatterplots, we can draw a conclusion that BTC have at least two correlation patterns. It’s the most distinctive one and the others do have linear or non-linear correlations to a certain extent.</p>
 <pre><code>## [1] &quot;English_United States.1252&quot;</code></pre>
-<div class="parcoords html-widget" height="768" id="htmlwidget-3cbd767df79cb9cb1422" style="width:2400px;height:768px; position:relative; overflow-x:auto; overflow-y:hidden; max-width:100%;" width="2400"></div>
-<script type="application/json" data-for="htmlwidget-3cbd767df79cb9cb1422">{"x":{"data":{"names":["1","2","3","4","5","6"],"Stock":["ADA_Adj.Close","BTC_Adj.Close","DOGE_Adj.Close","ETC_Adj.Close","ETH_Adj.Close","XRP_Adj.Close"],"20.Jan":[-0.560537614842537,-0.0822432718357931,-0.557152938155039,-0.276429022399808,-0.725574222715391,-0.573083582075741],"20.Feb":[-0.433514109634511,0.256018326638758,-0.331023080505704,0.113622154141821,-0.370837621775783,-0.414108659158557],"20.Mar":[-0.61436298923817,-0.49592601454893,-0.803205140999294,-0.518514819849754,-0.710811416500617,-0.690026021768993],"20.Apr":[-0.595647722851015,-0.398412123369203,-0.735637762641459,-0.55423609174503,-0.66057712209716,-0.663209988695042],"20.May":[-0.468357669640284,0.155865446283012,-0.439016100574824,-0.387530278567034,-0.503697257726199,-0.622944128651362],"20.Jun":[-0.264318502803786,0.217464821287743,-0.462781997233055,-0.433119596264066,-0.382102370957541,-0.661129641689004],"20.Jul":[0.044029873840205,0.244895325226774,-0.0228175160320086,-0.44062565886892,-0.281271381958868,-0.630238195618187],"20.Aug":[0.107589718748413,0.806868591407745,0.137020667733186,-0.363478896651023,0.337898451918981,-0.365474354187173],"20.Sep":[-0.165164694387582,0.536512865101869,-0.278270007676763,-0.589723305214012,0.191215247490709,-0.501814835549706],"20.Oct":[-0.117891732134291,0.887381066254738,-0.379762879252597,-0.587186013421823,0.225010535586581,-0.49746548312852],"20.Nov":[0.0207573602216761,2.16742335037217,-0.134870615451155,-0.535938524018745,0.70220993413594,-0.123871135623925],"20.Dec":[0.303654402038906,3.62171316981958,0.372622069115353,-0.487859956983246,1.29360229193244,0.189002264820576]},"options":{"rownames":false,"color":{"colorScale":"scaleOrdinal","colorBy":"Stock","colorScheme":"schemeDark2"},"brushMode":"1D-axes-multi","brushPredicate":"OR","reorderable":true,"margin":{"top":50,"bottom":50,"left":100,"right":50},"mode":false,"bundlingStrength":0.5,"smoothness":0},"autoresize":false,"tasks":null},"evals":[],"jsHooks":[]}</script>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-13-2.png" width="2400" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-14-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-15-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-15-2.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
-<pre><code>## [1] &quot;BTC return during the halving month&quot;</code></pre>
-<pre><code>##  [1]  206.212891  123.830078  -91.127930   15.185547   90.416016  265.691406
-##  [7]  682.756836 -108.852539 -248.769532 -837.465820 -154.634766  202.681641
-## [13]  465.509766  463.734375 -405.524414   48.816406  293.725586   55.835937
-## [19]    2.462891 -206.056641 -441.219726  100.815429   26.709961 -418.918945
-## [25]  116.566406  -71.881836  345.964844  344.733399  -86.626954  261.290040
-## [31] -239.355469</code></pre>
-<pre><code>## [1] &quot;BTC return range during these three years&quot;</code></pre>
-<pre><code>## [1] -2940.642  1893.521</code></pre>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-16-1.png" width="960" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-17-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-2.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-3.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-4.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-5.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-6.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-7.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-18-1.png" width="576" />
-<img src="finalproj_files/figure-html/unnamed-chunk-19-1.png" width="576" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-20-1.png" width="576" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-14-1.png" width="2400" />
+The alluvial chart visualizes the change of scaled closing prices in 6 stocks composition over time. If there is any intersection of different colored fills, it means that these intersected stocks have different changing tendencies during months of the intersection and they have poor correlation here. If not, we can say that they have great correlation.</p>
+<p>Note that because of standardization, it’s reasonable that the order of colored fills reverse when the scaled closing prices reverse, so we should just ignore this kind of intersections.</p>
+<ul>
+<li><p>Here we find the fact that monthly data correlations are highly obvious on every pair of stocks except those involving BTC and ETC.</p></li>
+<li><p>Correlation in 2020 is weaker than those in other years.</p></li>
+</ul>
+<p>We must further focus on 2020 by drawing a parallel coordinates chart with d3 because it’s the closest to the present and have the greatest effect on tendency predict.</p>
+<div class="parcoords html-widget" height="768" id="htmlwidget-7e8fc343c9f67ddbc19b" style="width:2400px;height:768px; position:relative; overflow-x:auto; overflow-y:hidden; max-width:100%;" width="2400"></div>
+<script type="application/json" data-for="htmlwidget-7e8fc343c9f67ddbc19b">{"x":{"data":{"names":["1","2","3","4","5","6"],"Stock":["ADA_Adj.Close","BTC_Adj.Close","DOGE_Adj.Close","ETC_Adj.Close","ETH_Adj.Close","XRP_Adj.Close"],"20.Jan":[-0.560537614842537,-0.0822432718357931,-0.557152938155039,-0.276429022399808,-0.725574222715391,-0.573083582075741],"20.Feb":[-0.433514109634511,0.256018326638758,-0.331023080505704,0.113622154141821,-0.370837621775783,-0.414108659158557],"20.Mar":[-0.61436298923817,-0.49592601454893,-0.803205140999294,-0.518514819849754,-0.710811416500617,-0.690026021768993],"20.Apr":[-0.595647722851015,-0.398412123369203,-0.735637762641459,-0.55423609174503,-0.66057712209716,-0.663209988695042],"20.May":[-0.468357669640284,0.155865446283012,-0.439016100574824,-0.387530278567034,-0.503697257726199,-0.622944128651362],"20.Jun":[-0.264318502803786,0.217464821287743,-0.462781997233055,-0.433119596264066,-0.382102370957541,-0.661129641689004],"20.Jul":[0.044029873840205,0.244895325226774,-0.0228175160320086,-0.44062565886892,-0.281271381958868,-0.630238195618187],"20.Aug":[0.107589718748413,0.806868591407745,0.137020667733186,-0.363478896651023,0.337898451918981,-0.365474354187173],"20.Sep":[-0.165164694387582,0.536512865101869,-0.278270007676763,-0.589723305214012,0.191215247490709,-0.501814835549706],"20.Oct":[-0.117891732134291,0.887381066254738,-0.379762879252597,-0.587186013421823,0.225010535586581,-0.49746548312852],"20.Nov":[0.0207573602216761,2.16742335037217,-0.134870615451155,-0.535938524018745,0.70220993413594,-0.123871135623925],"20.Dec":[0.303654402038906,3.62171316981958,0.372622069115353,-0.487859956983246,1.29360229193244,0.189002264820576]},"options":{"rownames":false,"color":{"colorScale":"scaleOrdinal","colorBy":"Stock","colorScheme":"schemeSet2"},"brushMode":"1D-axes-multi","brushPredicate":"OR","reorderable":true,"margin":{"top":50,"bottom":50,"left":100,"right":50},"mode":false,"bundlingStrength":0.5,"smoothness":0},"autoresize":false,"tasks":null},"evals":[],"jsHooks":[]}</script>
+<p>We can draw several conclusions on the data of monthly closing prices as below.</p>
+<ul>
+<li>ETH ,XRP and ADA have high correlation with each other in 2020.</li>
+<li>DOGE has high correlation with ADA since May in 2020.</li>
+<li>ETC and XRP has similar lagged tendency since March in 2020.</li>
+<li>BTC is the most distinctive one with tendency different from the others.</li>
+</ul>
+</div>
+<div id="correlation-coefficient" class="section level3" number="5.2.2">
+<h3><span class="header-section-number">5.2.2</span> Correlation Coefficient</h3>
+<p>We guess that whether correlations will be higher if we study the correlation of one-day trading returns rather than that of direct closing prices.</p>
+<p>Thus, we draw two correlation coefficient matrix plots based on one-day returns and daily closing prices.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-16-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<p>Note that standardization won’t change correlation coefficient so we can continue to use scaled data.</p>
+<ul>
+<li><p>Correlations of returns are much lower than those of closing prices, so we should discard our guess.</p></li>
+<li><p>BTC is almost uncorrelated with other stocks.</p></li>
+</ul>
+<p>Now we try to split the data to 3 different years and see if the correlation will fluctuate greatly.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-17-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-2.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-17-3.png" width="672" /></p>
+<ul>
+<li><p>Different from what the monthly data shows in the previous alluvial chart, in terms of 2018, we find the daily data of each stock is highly correlated with each other.</p></li>
+<li><p>When eliminating BTC, the correlation in 2019 is merely little bit weaker than that in 2018.</p></li>
+<li><p>When eliminating ETC, the correlation in 2020 is merely little bit weaker than that in 2018.</p></li>
+</ul>
+<p>Eliminating BTC in 2019 and ETC in 2020, other stocks are significantly positively related with each other.</p>
+</div>
+</div>
+<div id="time-series" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Time Series</h2>
+<div id="loess-smooth" class="section level3" number="5.3.1">
+<h3><span class="header-section-number">5.3.1</span> Loess Smooth</h3>
+<p>First let’s recall the distribution of closing prices of each stock and fit a smooth line by method of loess to see their tendency.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-18-1.png" width="960" /></p>
+<p>It seems that ETH and BTC are rising and worthy of investment.</p>
+<p>However, We cannot judge whether the closing prices is greatly affected by irregular disturbances, which will cause wrong prediction of tendency.</p>
+</div>
+<div id="stl-decomposition-of-btc" class="section level3" number="5.3.2">
+<h3><span class="header-section-number">5.3.2</span> STL Decomposition of BTC</h3>
+<p>To separate long-term tendency, seasonal variation and irregular disturbance, we use STL decomposition of time series. Compared to classical decomposition, STL can get a stable decomposition without affected by outliers. However, STL is an additive decomposition, i.e. <span class="math inline">\(Y=T+S+R\)</span>. T, S and R mean trend factor, seasonal factor, remainder factor respectively. The seasonal factor contains both information about seasonality and periodicity.</p>
+<p>Additive decomposition has some disadvantages as below.</p>
+<ol style="list-style-type: decimal">
+<li><p>When we predict the trend factor, additive decomposition lacks data in the beginning and the end because of moving average.</p></li>
+<li><p>It is insensitive to sharp increases and decreases and each component of it is too smooth, so it is difficult to capture influence of unexpected information.</p></li>
+<li><p>The prediction of its seasonal factor is so rigid. Its basic assumption is that the periodicity is fixed, and if its periodic fluctuation changes over time, additive decomposition cannot capture this information.</p></li>
+</ol>
+<p>Thus, we use multiplicative decomposition, i.e. <span class="math inline">\(Y=T*S*R\)</span> instead. However, R doesn’t provide such an option. We apply logarithmic function to the original data and apply exponential function after composition when predicting. This lead to multiplicative decomposition <span class="math inline">\(Y=\exp(\log(T)+\log(S)+\log(R))\)</span>.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-19-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-19-2.png" width="672" /></p>
+<p>Note that we use <span class="math inline">\(BoxCox(x,\lambda)\)</span> rather than logarithmic function here because when we choose <span class="math inline">\(\lambda=0\)</span> they are equivalent. In addition, when we choose <span class="math inline">\(\lambda=1\)</span> it’s equivalent to additive decomposition.</p>
+<ul>
+<li>We can see that BTC has a good rising trend as we analyze in the previous part. However, its remainder (i.e. irregular disturbance) is so unstable that the prediction of 30 days in the future has a decreasing trend.</li>
+</ul>
+</div>
+<div id="decomposition-over-monthly-data" class="section level3" number="5.3.3">
+<h3><span class="header-section-number">5.3.3</span> Decomposition over Monthly Data</h3>
+<p>Since we suppose investors do not speculate on these stocks expect for BTC, we can do decomposition on monthly time series rather than daily time series because we can reduce the number of predicting data (e.g. 6 months) to improve confidence level of our prediction.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-20-1.png" width="768" /></p>
+<p>As we can see from each stock’s decomposition</p>
+<ul>
+<li><p>ADA and ETH have a great rising trend and rising seasonal factor but we should notice that ETH has unstable fluctuation which we will check on the daily time series later.</p></li>
+<li><p>ETC is unworthy of investing because its trend is too horizontal.</p></li>
+<li><p>XRP and DOGE has a good rising trend and stable random fluctuation but we should check on their prediction later.</p></li>
+</ul>
+</div>
+<div id="forecasts-from-stl" class="section level3" number="5.3.4">
+<h3><span class="header-section-number">5.3.4</span> Forecasts from STL</h3>
+<p>We predict seasonal factor according to its periodicity and predict trend factor according to its loess curve. Then we combine them and get prediction of closing prices (<span class="math inline">\(Y=\exp(\log(T)+\log(S)+\log(R))\)</span>).</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-21-1.png" width="576" /></p>
+<p>From 6-month forecasts of each stock, we can draw some conclusions as below.</p>
+<ul>
+<li><p>XRP will decrease steadily in the new few months so we should not invest on it.</p></li>
+<li><p>ADA and DOGE will fall steadily and then start to rebound in the next few month so we should buy in after the beginning of increasing.</p></li>
+<li><p>ETH has a relatively stable general rising prediction in the long term but as we said before, we should check its remainder outliers later.</p></li>
+</ul>
+</div>
+<div id="remainder-analysis" class="section level3" number="5.3.5">
+<h3><span class="header-section-number">5.3.5</span> Remainder Analysis</h3>
+<p>Now we check the number of outliers of remainder. For simplicity, we regard those greater than <span class="math inline">\(Q_{99}\)</span> or less than <span class="math inline">\(Q_{1}\)</span> as outliers.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-22-1.png" width="576" /></p>
+<p>Analyzing on remainders of the daily time series, we find that</p>
+<ul>
+<li><p>Remainder outliers of ETH gather in 2018.</p></li>
+<li><p>XRP is quite unstable recently and hard to predict.</p></li>
+<li><p>BTC and ETC have few outliers in 2020 which means they have extremely stable irregular fluctuation and their performances are almost completely influenced by their trend and seasonal factor.</p></li>
+</ul>
 
+</div>
+</div>
 </div>
             </section>
 
@@ -192,6 +334,20 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

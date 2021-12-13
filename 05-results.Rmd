@@ -1,5 +1,18 @@
 # Results
 
+## Distribution and Dependency of Closing Price
+
+### Color Palette
+
+We choose qualitative color palette to highlight visual differences between cryptocurrencies. Here we choose "Set2" in RColorBrewer.
+
+```{r,fig.height=3}
+library(RColorBrewer)
+par(mar=c(1,1,1,1))
+display.brewer.pal(6,"Set2")
+palette = brewer.pal(6,"Set2")
+```
+
 ```{r}
 library(plyr)
 
@@ -35,23 +48,18 @@ cryptos <- join_all(list(ADA, BTC, DOGE, ETC, ETH, XRP), by='Date', type='full')
 
 ```
 
+### Dependency between Volume and Closing price
+
+We try to find out if there is any dependency between volume and closing price so that we can combine them together to analyze later. The y-axis is limited by the difference of orders of magnitude between volume of each kind of cryptocurrency stock. Therefore, we have to split the figure of 6 lines to 6 figures as below.
 
 ```{r}
 library(stringr)
 library(tidyverse)
 close=cryptos[grep(".*_Adj.Close",colnames(cryptos))]
 cryptos$Date = as.Date(cryptos$Date)
-pairs(close)
-```
 
-
-
-```{r}
 library(ggplot2)
 library(gridExtra)
-#missingRows = which(BTC == "null")
-#BTC=BTC[-missingRows,]
-#BTC=as.data.frame(lapply(BTC,as.numeric))
 
 p=paste0('p',1:length(dataName))
 i=0
@@ -71,22 +79,28 @@ for(stock_name in dataName){
 }
 grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2, nrow=3)
 ```
+Note that the magnitude of volume is so large that almost all points gather at the lower left corner and we use `log(Volume)` instead of `Volume`.
 
+We can draw some conclusions below.
 
+- Closing prices of each stock is independent of volumes of that because most points of each figure are distributed on a horizontal line respectively.
+
+- Some stocks like ADA, DOGE and XRP, have similar outlier pattern. We should research their correlation later.
+
+Now We should drop volumes and only concentrate on closing prices.
+
+### Distribution of Closing Price
+
+First we want to research the changes of each stock over date. Limited by different magnitudes, we still have to draw 6 figures respectively.
 
 ```{r}
 library(ggridges)
 close_date = data.frame(Date=cryptos$Date,close)
-#close_date$Date=factor(close_date$Date)
-#plot(close_date$Date,close_date$ADA_Adj.Close)
-#ggplot(close_date,aes(x=1:nrow(close_date),y=ADA_Adj.Close))+geom_line()
 
 close_date %>% 
   pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
   ggplot(aes(x=Date,y=Adj.Close, color=stock_name)) +
   geom_line()+
-  #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
-  #ggtitle("log(Adj.Close)")
   theme_grey(14)
 
 # 这里有个问题，最好把这几张图竖着排列即6×1，但是grid.arrange结果很奇怪
@@ -110,15 +124,15 @@ grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2, nrow=3)
 #存在一个问题 各个stock的close数量级差别有点大，最好标准化
 # 标准化之后的ridge图意义是在观察close在分位数上的趋势分布
 # 比起普通6条折线在一个图的优点是，他们的纵坐标相差很大会导致
-#close_date %>% 
-#  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
-#  #filter(stock_name=="BTC_Adj.Close") %>%
-#  ggplot(aes(x=Adj.Close, y=reorder(stock_name, Adj.Close, median))) +
-#  geom_density_ridges(rel_min_height = 0.01,fill="blue", alpha=0.5)+
-#  scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
-#  ggtitle("log(Adj.Close)")
-#  theme_grey(14)
 ```
+- Here we cannot say directly that which one is more worthy of investing because some stocks are so unstable that we don't know whether the trend will continue in the next few days or months.
+
+- From these figures above, we find that some stocks have similar distribution within a period of time (e.g. ADA and DOGE in 2020), which inspires us that we can suppose trends of some relatively stable stocks will continue for a period of time and use their trends to help to predict the future trend of some unstable stocks. It's further researched in the part of time series analysis.
+
+### Distribution of Scaled Closing Price
+
+
+Considering finite funds of investors, some rising stocks like BTC seem currently promising but their prices are much higher than others too, which means that investors need to put more money first. Thus, we standardize all closing prices of each stock and draw a joint line chart and ridge line chart so that we can eliminate the effect of magnitude.
 
 
 ```{r}
@@ -129,32 +143,45 @@ close_date_scaled %>%
   pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
   ggplot(aes(x=Date,y=Adj.Close, color=stock_name)) +
   geom_line()+
+  scale_color_brewer(palette = "Set2")+
   theme_grey(14)
-
-
-
 ```
-
 
 ```{r}
 library(ggridges)
 close_date_scaled %>% 
   pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
-  #filter(stock_name=="BTC_Adj.Close") %>%
   ggplot(aes(x=Adj.Close, y=reorder(stock_name, Adj.Close, median))) +
-  geom_density_ridges(fill="blue", alpha=0.5)+
-  #scale_x_continuous(trans='log',labels = function(x) format(round(log(x),2), nsmall=2))+
-  #ggtitle("log(Adj.Close)")
-  theme_grey(14)
+  geom_density_ridges(aes(fill=stock_name), alpha=0.5)+
+  scale_fill_brewer(palette = "Set2")+
+  xlab("Standardized Adj.Close")+
+  ylab("Stock")+
+  theme_grey(14)+
+  theme(legend.position="none")
 
 ```
 
+Here we can draw some conclusions.
 
+- BTC has three cluster center where a large number of standardized prices gather. It implies that BTC is unstable and the most difficult one to predict.
 
+- However, BTC has extremely rising tendency which seems likely to return to the level of the beginning of 2018, so speculators may take the risk of stopping rising and a sharp decline to invest on it. At least a short-term investment on BTC is plausible.
 
-```{r,fig.height=8, fig.width=25}
+## Correlation between pairs of stocks
+
+### Correlation Analysis
+To solve unstability, we can research on correlation to use highly correlated stocks to help to predict. Thus, we first draw a matrix of scatterplots of closing prices of each stock to have a preliminary exploration on the correlation pattern. Then we draw a alluvial chart and a parallel coordinates chart.
+
+```{r}
+pairs(close_scaled)
+```
+
+From the matrix of scatterplots, we can draw a conclusion that BTC have at least two correlation patterns. It's the most distinctive one and the others do have linear or non-linear correlations to a certain extent.
+
+```{r,fig.height=15, fig.width=25}
 library(parcoords)
 library(lubridate)
+library(ggalluvial)
 
 Sys.setlocale("LC_TIME", "English")
 close_month_scaled = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct_inorder(factor(month(cryptos$Date, label=TRUE))),close_scaled) %>%
@@ -169,6 +196,29 @@ close_month_scaled = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Mo
     )%>%
   ungroup()
 
+close_month_scaled %>% 
+  mutate(Month=paste(Year,Month,sep=" ")) %>%
+  subset(select=-c(Year)) %>%
+  pivot_longer(-c(Month),names_to = "Stock",values_to = "Close") %>% 
+  ggplot(aes(alluvium = Stock, x = Month, stratum = Stock, y=Close,fill=Stock))+
+  geom_alluvium(color = "blue") +
+  geom_stratum(color = "black", fill = "white")+
+  #geom_text(stat = "stratum", aes(label = substr(paste(after_stat(stratum)),1,3)),check_overlap = TRUE,size=5) +
+  theme_bw(25)+
+  theme(legend.key.size = unit(40, "pt"),legend.text=element_text(size=20),axis.text.x = element_text(size=25 ,vjust = 0.5, hjust = 0.5, angle = 90) ,axis.text.y =element_text(size=25) ,axis.title.x = element_text(size = 30) ,axis.title.y = element_text(size = 30))
+```
+The alluvial chart visualizes the change of scaled closing prices in 6 stocks composition over time. If there is any intersection of different colored fills, it means that these intersected stocks have different changing tendencies during months of the intersection and they have poor correlation here. If not, we can say that they have great correlation.
+
+Note that because of standardization, it's reasonable that the order of colored fills reverse when the scaled closing prices reverse, so we should just ignore this kind of intersections.
+
+- Here we find the fact that monthly data correlations are highly obvious on every pair of stocks except those involving BTC and ETC. 
+
+- Correlation in 2020 is weaker than those in other years.
+
+We must further focus on 2020 by drawing a parallel coordinates chart with d3 because it's the closest to the present and have the greatest effect on tendency predict.
+
+
+```{r,fig.height=8, fig.width=25}
 #20年的12个月
 tmp=subset(mutate(close_month_scaled, Month=paste(Year,Month,sep=" ")), select = -c(Year))
 tmp=data.frame(tmp,row.names = 1)
@@ -184,24 +234,22 @@ parcoords::parcoords(
   reorderable = TRUE,
   brushMode = "1d-Multi",
   brushPredicate = "OR",
-  color = list(colorScale = "scaleOrdinal", colorBy = "Stock", colorScheme = "schemeDark2"),
+  color = list(colorScale = "scaleOrdinal", colorBy = "Stock", colorScheme = "schemeSet2"),
   withD3 = TRUE
 )
-
-
-library(ggalluvial)
-
-close_month_scaled %>% 
-  mutate(Month=paste(Year,Month,sep=" ")) %>%
-  subset(select=-c(Year)) %>%
-  pivot_longer(-c(Month),names_to = "Stock",values_to = "Close") %>% 
-  ggplot(aes(alluvium = Stock, x = Month, stratum = Stock, y=Close,fill=Stock))+
-  geom_alluvium(color = "blue") +
-  geom_stratum(color = "black", fill = "white")+
-  #geom_text(stat = "stratum", aes(label = substr(paste(after_stat(stratum)),1,3)),check_overlap = TRUE,size=5) +
-  theme_bw(25)+
-  theme(legend.key.size = unit(40, "pt"),legend.text=element_text(size=20),axis.text.x = element_text(size=25 ,vjust = 0.5, hjust = 0.5, angle = 90) ,axis.text.y =element_text(size=25) ,axis.title.x = element_text(size = 30) ,axis.title.y = element_text(size = 30))
 ```
+We can draw several conclusions on the data of monthly closing prices as below.
+
+- ETH ,XRP and ADA have high correlation with each other in 2020. 
+- DOGE has high correlation with ADA since May in 2020.
+- ETC and XRP has similar lagged tendency since March in 2020.
+- BTC is the most distinctive one with tendency different from the others.
+
+### Correlation Coefficient
+
+We guess that whether correlations will be higher if we study the correlation of one-day trading returns rather than that of direct closing prices.
+
+Thus, we draw two correlation coefficient matrix plots based on one-day returns and daily closing prices.
 
 ```{r}
 library(corrplot)
@@ -218,36 +266,56 @@ return_date = data.frame(Date=cryptos$Date[2:nrow(cryptos)],return)
 return_scaled = data.frame(scale(return))
 return_date_scaled = data.frame(Date=cryptos$Date[2:nrow(cryptos)],return_scaled)
 
-# 注意标准化不会影响相关系数，这里只是为了后续好处理
-corrplot(corr=cor(return_scaled),method="circle",order = "AOE",addCoef.col = "grey")
+corrplot(corr=cor(return_scaled),method="circle",order = "AOE",addCoef.col = "grey",tl.col = "black",tl.cex = 0.7)
 
-corrplot(corr=cor(close_scaled),method="circle",order = "AOE",addCoef.col = "grey")
+corrplot(corr=cor(close_scaled),method="circle",order = "AOE",addCoef.col = "grey",tl.col = "black",tl.cex = 0.7)
 ```
 
+Note that standardization won't change correlation coefficient so we can continue to use scaled data.
+
+- Correlations of returns are much lower than those of closing prices, so we should discard our guess.
+
+- BTC is almost uncorrelated with other stocks.
+
+Now we try to split the data to 3 different years and see if the correlation will fluctuate greatly.
 
 ```{r}
 
-corrplot(corr=cor(filter(close_date_scaled,year(Date)==2018)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey")
+corrplot(corr=cor(filter(close_date_scaled,year(Date)==2018)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey",tl.col = "black",tl.cex = 0.7)
 
-corrplot(corr=cor(filter(close_date_scaled,year(Date)==2019)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey")
+corrplot(corr=cor(filter(close_date_scaled,year(Date)==2019)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey",tl.col = "black",tl.cex = 0.7)
 
-corrplot(corr=cor(filter(close_date_scaled,year(Date)==2020)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey")
+corrplot(corr=cor(filter(close_date_scaled,year(Date)==2020)[2:length(close_date_scaled)]),method="circle",order = "original",addCoef.col = "grey",tl.col = "black",tl.cex = 0.7)
 
 # 每个虚拟货币都有减半的时间点 比如BTC halving最近发生在2020年5月11日 会影响货币股价
 #但是观察前面的无标准化图可以看出其实2020五月份附近波动没有非常剧烈
 #原因是这是大家都能知道的结果 对整个市场在该时间点之前都是已知的信息 无法影响市场
-print("BTC return during the halving month")
-return_date[return_date$Date>=as.Date("2020-5-1") & return_date$Date<=as.Date("2020-5-31"),]$BTC_return
-print("BTC return range during these three years")
-range(return_date$BTC_return)
+#print("BTC return during the halving month")
+#return_date[return_date$Date>=as.Date("2020-5-1") & return_date$Date<=as.Date("2020-5-31"),]$BTC_return
+#print("BTC return range during these three years")
+#range(return_date$BTC_return)
 
 ```
 
+- Different from what the monthly data shows in the previous alluvial chart, in terms of 2018, we find the daily data of each stock is highly correlated with each other.
+
+- When eliminating BTC, the correlation in 2019 is merely little bit weaker than that in 2018.
+
+- When eliminating ETC, the correlation in 2020 is merely little bit weaker than that in 2018.
+
+Eliminating BTC in 2019 and ETC in 2020, other stocks are significantly positively related with each other.
+
+## Time Series
+
+### Loess Smooth
+
+First let's recall the distribution of closing prices of each stock and fit a smooth line by method of loess to see their tendency.
+
 ```{r, fig.height=5, fig.width=10}
-close_date %>% 
-  pivot_longer(-Date,names_to = "stock_name", values_to = "Adj.Close") %>%
+close_date_scaled %>% 
+  pivot_longer(-Date,names_to = "stock_name", values_to = "Scaled.Adj.Close") %>%
   mutate(stock_name=substr(stock_name,1,3)) %>%
-  ggplot(aes(x=Date,y=Adj.Close)) +
+  ggplot(aes(x=Date,y=Scaled.Adj.Close)) +
   geom_line()+
   geom_smooth(method = "loess", se=FALSE, span=0.5 ,lwd=1)+
   facet_grid(stock_name~.,scales = "free_y")+
@@ -255,39 +323,37 @@ close_date %>%
 
 ```
 
+It seems that ETH and BTC are rising and worthy of investment.
+
+However, We cannot judge whether the closing prices is greatly affected by irregular disturbances, which will cause wrong prediction of tendency.
+
+### STL Decomposition of BTC
+
+To separate long-term tendency, seasonal variation and irregular disturbance, we use STL decomposition of time series. Compared to classical decomposition, STL can get a stable decomposition without affected by outliers. However, STL is an additive decomposition, i.e. $Y=T+S+R$. T, S and R mean trend factor, seasonal factor, remainder factor respectively. The seasonal factor contains both information about seasonality and periodicity.
+
+Additive decomposition has some disadvantages as below.
+
+1. When we predict the trend factor, additive decomposition lacks data in the beginning and the end because of moving average.
+
+2. It is insensitive to sharp increases and decreases and each component of it is too smooth, so it is difficult to capture influence of unexpected information.
+
+3. The prediction of its seasonal factor is so rigid. Its basic assumption is that the periodicity is fixed, and if its periodic fluctuation changes over time, additive decomposition cannot capture this information.
+
+Thus, we use multiplicative decomposition, i.e. $Y=T*S*R$ instead. However, R doesn't provide such an option. We apply logarithmic function to the original data and apply exponential function after composition when predicting. This lead to multiplicative decomposition $Y=\exp(\log(T)+\log(S)+\log(R))$.
+
 ```{r}
 library(forecast)
-#这里以天为单位的时间序列最后是2020的第362天的原因是中间缺少了4天缺失值
-#STL比起普通的compose优点是不受离群点干扰获得稳定的分解，但是是加法分解（additive decomposition）
-#Y=T+S+I 这里的T其实是经典时间序列分解里的TC项，为了避免对C通过基于历史周期性因素认为判断，所以直接将二者合起来了，但是考虑到虚拟货币价格并不太具有周期性，且STl对T和S都进行了局部多项式回归（用Loess估算非线性关系）而非简单的线性回归趋势外推，所以不规则扰动项依然保持着随机性
-
-#加法分解存在的问题是
-#1、分解的时候，对T的预测总是缺乏首尾的数值（其实是对T缺首，对C缺首尾）。这一点做滑动平均（moving average）就会有体会，用前n个序列的均值来作为n+1时刻的趋势预测，那么前面n个数值注定都是缺失值，而最后n个数值也无法获得。
-
-#2、对于骤增和骤降不敏感，显得过于平滑，因此如果有突发的事件也难以进行捕捉；
-
-#3、对季节性的预测非常刻板，基本假设中周期性是固定的，如果随着时间改变其周期性波动也发生改变，可加性分解就无法捕捉到。
-
-#由于STl是加法分解，T中隐含的周期性因素一定是波动的而不是具有explicit pattern的，所以可加性分解一定无法捕捉到这种信息，会导致预测不准确
-
-#所以我们使用乘法预测（multiplicative decomposition），也就是Y=T*S*I，但是STL本身并不提供这个选项，所以我们对原始数据取log，分解后再对各成分反向变化取指数
-#（用box-cox变换就可以，lambda=0就是乘法分解，lambda=1就是加法分解）
-
-#C和S的区别是季节性因素的波动长度固定，例如每12个月都是一个大致在x1,...,x12的水平，而周期性因素的波动长度一般是不一样的，例如1-7天维持一个稳定水平x1，8-10天维持另一个水平x2，11-15天又维持一个水平x3
 
 close_ts<-ts(close,frequency=365,start=c(2018,1,1))
 
-close_stl=close_ts[,"ADA_Adj.Close"] %>%
+close_stl=close_ts[,"BTC_Adj.Close"] %>%
   stl(t.window=13, s.window="periodic", robust=TRUE)
-autoplot(close_stl)
+autoplot(close_stl,main="BTC STL Decomposition")
 fcast=forecast(close_stl,method = "naive",h=30)
-fcast %>% autoplot()
-
-fcast <- stlf(close_ts[,"ADA_Adj.Close"], method='naive' ,h=30, level=c(80,95))
-fcast %>% autoplot()
+fcast %>% autoplot(main="30-day Forecasts of BTC")
 
 
-close_month = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct_inorder(factor(month(cryptos$Date, label=TRUE))),close) %>%
+close_month = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct_inorder(factor(lubridate::month(cryptos$Date, label=TRUE))),close) %>%
   dplyr::group_by(Year,Month)%>%
   dplyr::summarise(
     ADA_Adj.Close=mean(ADA_Adj.Close),
@@ -301,13 +367,13 @@ close_month = data.frame(Year=fct_inorder(factor(year(cryptos$Date))), Month=fct
 
 close_month_ts<-ts(close_month,frequency=12,start=c(2018,1))
 
-close_month_stl = close_month_ts[,"BTC_Adj.Close"] %>%
-  stl(t.window=13, s.window="periodic", robust=TRUE)
+#close_month_stl = close_month_ts[,"ETC_Adj.Close"] %>%
+#  stl(t.window=13, s.window="periodic", robust=TRUE)
 
-autoplot(close_month_stl)
+#autoplot(close_month_stl)
 
-fcast=forecast(close_month_stl,method = "naive",h=6)
-fcast %>% autoplot()
+#fcast=forecast(close_month_stl,method = "naive",h=6)
+#fcast %>% autoplot()
 
 
 #观察两个预测图，二者的区别是乘法预测的置信区间有着和expectation一样的变化趋势（随着forecast value变化，置信区间以相同趋势波动），而加法预测的置信区间的发散更加明显（随着forecast value上升，置信区间上界在上升，下界在下降）
@@ -315,15 +381,57 @@ fcast %>% autoplot()
 tmp=as.data.frame(apply(close_month[3:length(close_month)],c(1,2),BoxCox,lambda=0,simplify = FALSE))
 close_month_trans=data.frame(close_month[1:2],tmp)
 close_month_trans_ts<-ts(close_month_trans,frequency=12,start=c(2018,1))
-close_month_trans_stl = close_month_trans_ts[,"BTC_Adj.Close"] %>%
-  stl(t.window=13, s.window="periodic", robust=TRUE)
+#close_month_trans_stl = close_month_trans_ts[,"ETC_Adj.Close"] %>%
+#  stl(t.window=13, s.window="periodic", robust=TRUE)
 
-autoplot(close_month_trans_stl)
+#autoplot(close_month_trans_stl)
 
-fcast=forecast(close_month_trans_stl,method = "naive",h=6)
-fcast %>% autoplot()
+#fcast=forecast(close_month_trans_stl,method = "naive",h=6)
+#fcast %>% autoplot()
+
+
+
 ```
 
+Note that we use $BoxCox(x,\lambda)$ rather than logarithmic function here because when we choose $\lambda=0$ they are equivalent. In addition, when we choose $\lambda=1$ it's equivalent to additive decomposition.
+
+- We can see that BTC has a good rising trend as we analyze in the previous part. However, its remainder (i.e. irregular disturbance) is so unstable that the prediction of 30 days in the future has a decreasing trend.
+
+### Decomposition over Monthly Data
+
+Since we suppose investors do not speculate on these stocks expect for BTC, we can do decomposition on monthly time series rather than daily time series because we can reduce the number of predicting data (e.g. 6 months) to improve confidence level of our prediction.
+
+
+```{r,fig.height=25,fig.width=8}
+
+p=paste0('p',1:length(dataName))
+i=0
+for(stock_name in dataName){
+  i=i+1
+  tmp_stl = close_month_trans_ts[,paste(stock_name,"Adj.Close",sep="_")] %>%
+    stl(t.window=13, s.window="periodic", robust=TRUE)
+  
+  tmp_plot = autoplot(tmp_stl, main=paste(stock_name,"STL Decomposition", sep=" "))
+
+
+  
+  assign(p[i], tmp_plot)
+}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
+
+```
+
+As we can see from each stock's decomposition
+
+- ADA and ETH have a great rising trend and rising seasonal factor but we should notice that ETH has unstable fluctuation which we will check on the daily time series later.
+
+- ETC is unworthy of investing because its trend is too horizontal.
+
+- XRP and DOGE has a good rising trend and stable random fluctuation but we should check on their prediction later.
+
+### Forecasts from STL
+
+We predict seasonal factor according to its periodicity and predict trend factor according to its loess curve. Then we combine them and get prediction of closing prices ($Y=\exp(\log(T)+\log(S)+\log(R))$).
 
 ```{r, fig.height=10,fig.width=6}
 p=paste0('p',1:length(dataName))
@@ -337,30 +445,23 @@ for(stock_name in dataName){
 }
 grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
 ```
-```{r, fig.height=10,fig.width=6}
-#先出示这个图，展示在天为单位的预测中，波动十分剧烈，不太稳定，然后展示月为单位的预测，可以从最开始的分布图中发现所有的股价除了2018年初那段时间后面变化基本十分平滑，所以可以以月份为单位进行股价均值的预测，对于投资人来说只需要在一个月中选择合适的时机进入市场即可（例如2022年1月的预测均值比较低，3月比较高，适合1月买入，3月卖出，那么如果1月某一天达到预测的80%置信区间下界附近，就非常适合进入市场）
 
-tmp=as.data.frame(apply(close,c(1,2),BoxCox,lambda=0,simplify = FALSE))
-close_date_trans=data.frame(close_date$Date,tmp)
-close_date_trans_ts<-ts(close_date_trans,frequency=365,start=c(2018,1,1))
+From 6-month forecasts of each stock, we can draw some conclusions as below.
 
-p=paste0('p',1:length(dataName))
-i=0
-for(stock_name in dataName){
-  i=i+1
-  close_date_trans_stl = close_date_trans_ts[,paste(stock_name,"Adj.Close",sep="_")] %>%
-    stl(t.window=13, s.window="periodic", robust=TRUE)
-  fcast=forecast(close_date_trans_stl,method = "naive",h=30)
-  assign(p[i], fcast %>% autoplot(main=paste("Forecasts of",stock_name, "from STL",sep=" ")))
-}
-grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
-```
+- XRP will decrease steadily in the new few months so we should not invest on it.
 
+- ADA and DOGE will fall steadily and then start to rebound in the next few month so we should buy in after the beginning of increasing.
 
-```{r,fig.height=10,fig.width=6}
+- ETH has a relatively stable general rising prediction in the long term but as we said before, we should check its remainder outliers later.
+
+### Remainder Analysis
+
+Now we check the number of outliers of remainder. For simplicity, we regard those greater than $Q_{99}$ or less than $Q_{1}$ as outliers.
+
+```{r,fig.height=20,fig.width=6}
 # 观察不规则变动remainder的分布，对于不稳定的stock可以用最近一段时期内数据的相关系数较高的其他稳定的stock来辅助建立投资策略
 #例如这里观察到XRP最近不稳定，因此用2020年与其相关系数最大的ETH的走势来预测
-
+#,fig.height=10,fig.width=6
 
 library(data.table)
 
@@ -396,6 +497,13 @@ grid.arrange(p1,p2,p3,p4,p5,p6, ncol=1, nrow=6)
 
 ```
 
+Analyzing on remainders of the daily time series, we find that
+
+- Remainder outliers of ETH gather in 2018.
+
+- XRP is quite unstable recently and hard to predict.
+
+- BTC and ETC have few outliers in 2020 which means they have extremely stable irregular fluctuation and their performances are almost completely influenced by their trend and seasonal factor.
 
 
 

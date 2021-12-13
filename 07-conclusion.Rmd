@@ -1,2 +1,8 @@
 # Conclusion
 
+We first analyzed stock closing prices of 6 popular cryptocurrencies by researching on distribution and dependency relation of closing price to get a preliminary exploration of data features. And then we studied the correlation between each pair of stocks to improve our time series prediction later. Finally, we regarded closing prices as time series, decomposed them by method of STL and predicted their performances in the next few months. Combining our findings in these three parts, we can solve the problems mentioned in Chapter 1 Introduction.
+
+1. Q: Can we make use of features of data to establish a portfolio based on these cryptocurrencies’ stocks?
+  A: We find these cryptocurrencies have similar distribution except BTC (after standardization). Furthermore, if we focus on 2020,
+  
+2. Q: 
