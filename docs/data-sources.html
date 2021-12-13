@@ -24,7 +24,7 @@
 <meta name="author" content="Candong Chen, Qi Meng" />
 
 
-<meta name="date" content="2021-11-14" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -76,9 +76,18 @@
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
-<li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
+<li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-detection"><i class="fa fa-check"></i><b>4.1</b> Missing Data Pattern Detection</a></li>
+<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-after-removing-sol"><i class="fa fa-check"></i><b>4.2</b> Missing Data Pattern After Removing SOL</a></li>
+<li class="chapter" data-level="4.3" data-path="missing-values.html"><a href="missing-values.html#solution-to-the-missing-data"><i class="fa fa-check"></i><b>4.3</b> Solution to the Missing Data</a></li>
+</ul></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
+<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="interactive-component.html"><a href="interactive-component.html#interactive-standardized-crypto-stocks"><i class="fa fa-check"></i><b>6.1</b> Interactive Standardized Crypto Stocks</a></li>
+<li class="chapter" data-level="6.2" data-path="interactive-component.html"><a href="interactive-component.html#interactive-single-stock"><i class="fa fa-check"></i><b>6.2</b> Interactive Single Stock</a></li>
+</ul></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -101,6 +110,55 @@
             <section class="normal" id="section-">
 <div id="data-sources" class="section level1" number="2">
 <h1><span class="header-section-number">Chapter 2</span> Data sources</h1>
+<p>In order to analyze and gain some insights from the cryptocurrency market, out team chose seven types of popular cryptocurrencies stocks in this project. The chosen cryptos are <code>Bitcoin</code>, <code>Cardano</code>, <code>Dogecoin</code>, <code>EthereumClassic</code>, <code>Ethereum</code>, <code>ReneSola</code> and <code>XRP</code>. These cryptos all have large “market cup” (calcualted by multiplying the price by the number of coins in circulation), which reflect the popularity of the cryptos. After the researching, our team found that the cryptocurrency market became more stable and mature after the year of 2017 compared to the earlier stage. Thus, we decided to use the data from 1/1/2018 to 12/31/2020.</p>
+<p>To collect the stocks’ data, one of our teammate Candong pulled it from <code>Yahoo Finance</code>, which is a reliable and well-known platform for stocks. In the <code>Historical Data</code> session for each stock, we could apply the filter to select the range of date that we want. And then, we could download the each of the stock separately into <code>csv</code> files. Since we have the same range of date for all selected stock, the number of entries of each stock are expected to be the same, which is around 1100 records. Each of the stock would have 7 columns. The column names and the descriptions are as listed below.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Date</td>
+<td>Date</td>
+<td>Year-Month-Day</td>
+</tr>
+<tr class="even">
+<td>Open</td>
+<td>Numeric</td>
+<td>Open price of the stock</td>
+</tr>
+<tr class="odd">
+<td>High</td>
+<td>Numeric</td>
+<td>Highest price of the stock in this date</td>
+</tr>
+<tr class="even">
+<td>Low</td>
+<td>Numeric</td>
+<td>Lowest price of the stock in this date</td>
+</tr>
+<tr class="odd">
+<td>Close</td>
+<td>Numeric</td>
+<td>Close price of the stock</td>
+</tr>
+<tr class="even">
+<td>Adj Close</td>
+<td>Numeric</td>
+<td>The adjusted close price of the stock</td>
+</tr>
+<tr class="odd">
+<td>Volumne</td>
+<td>Numeric</td>
+<td>Number of share traded in this date for the stock</td>
+</tr>
+</tbody>
+</table>
+<p>As we preprocess the data and investigate it, we found that the number of records for <code>ReneSola</code> doesn’t match other stocks’. Having inconsistant number of records would be difficult for us to perform the analysis for this set of cryptos. The detailed information would be described in the <code>Missing Data</code> session.</p>
 
 </div>
             </section>

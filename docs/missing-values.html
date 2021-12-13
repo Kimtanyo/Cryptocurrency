@@ -24,7 +24,7 @@
 <meta name="author" content="Candong Chen, Qi Meng" />
 
 
-<meta name="date" content="2021-11-14" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -76,9 +76,18 @@
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
-<li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
+<li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-detection"><i class="fa fa-check"></i><b>4.1</b> Missing Data Pattern Detection</a></li>
+<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-after-removing-sol"><i class="fa fa-check"></i><b>4.2</b> Missing Data Pattern After Removing SOL</a></li>
+<li class="chapter" data-level="4.3" data-path="missing-values.html"><a href="missing-values.html#solution-to-the-missing-data"><i class="fa fa-check"></i><b>4.3</b> Solution to the Missing Data</a></li>
+</ul></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
+<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="interactive-component.html"><a href="interactive-component.html#interactive-standardized-crypto-stocks"><i class="fa fa-check"></i><b>6.1</b> Interactive Standardized Crypto Stocks</a></li>
+<li class="chapter" data-level="6.2" data-path="interactive-component.html"><a href="interactive-component.html#interactive-single-stock"><i class="fa fa-check"></i><b>6.2</b> Interactive Single Stock</a></li>
+</ul></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -101,7 +110,36 @@
             <section class="normal" id="section-">
 <div id="missing-values" class="section level1" number="4">
 <h1><span class="header-section-number">Chapter 4</span> Missing values</h1>
+<p>Our teams want to analyze the cryptocurrency market by analyzing seven chosen cryptos with large market cups. We aim to have seven stocks data within same range of date. We expected the seven stocks would all have data on each date when the stock market operates. In order to verify it, we performed the missing data pattern analysis. The result shows that there exists some missing data patterns in the stocks. The team investigated the patterns and gave the solution as described below.</p>
+<div id="missing-data-pattern-detection" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Missing Data Pattern Detection</h2>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>By inspecting the plots above, we can notice that there exists some missing data patterns among the seven crypto stocks. The plot shows that there are two types of patterns. The first pattern shows that <code>SOL</code> crypto has some entries which other cryptos don’t have. Meanwhile, the other pattern indicates that there are missing entries which happen only on <code>SOL</code> crypto. It looks like <code>SOL</code>’s data is not consistent with other cryptos on the dates. However, other six cryptos seems to have consistent data. To gain more information about it, we looked at the number of <code>null</code> data for each column as shown below.</p>
+<pre><code>##           Date  ADA_Adj.Close     ADA_Volume  BTC_Adj.Close     BTC_Volume 
+##              0              4              4              4              4 
+## DOGE_Adj.Close    DOGE_Volume  ETC_Adj.Close     ETC_Volume  ETH_Adj.Close 
+##              4              4              4              4              4 
+##     ETH_Volume  SOL_Adj.Close     SOL_Volume  XRP_Adj.Close     XRP_Volume 
+##              4            341            341              4              4</code></pre>
+<p>The result shows that <code>SOL</code> has missing data on 341 rows while other cryptos all have 4 rows of missing data. Our team has the rough conclusion that <code>SOL</code> has inconsistant data with other cryptos. We verify the thought by removing the <code>SOL</code> related columns in the table and perform the analysis above again.</p>
+</div>
+<div id="missing-data-pattern-after-removing-sol" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Missing Data Pattern After Removing SOL</h2>
+<p>We now join the stock data of the chosen cryptos except <code>SOL</code>. And we plot the missing data pattern plot and the number of missing data rows again.
+<img src="finalproj_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre><code>##           Date  ADA_Adj.Close     ADA_Volume  BTC_Adj.Close     BTC_Volume 
+##              0              0              0              0              0 
+## DOGE_Adj.Close    DOGE_Volume  ETC_Adj.Close     ETC_Volume  ETH_Adj.Close 
+##              0              0              0              0              0 
+##     ETH_Volume  XRP_Adj.Close     XRP_Volume 
+##              0              0              0</code></pre>
+<p>The results above show that the there isn’t any missing data now after removing the <code>SOL</code> stock data. It verifies our thought that <code>SOL</code> doesn’t have consistent data with other cryptos, while the rest of the six cryptos remain consistent.</p>
+</div>
+<div id="solution-to-the-missing-data" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Solution to the Missing Data</h2>
+<p>Since the team aims to investigate the cryptocurrency market within a selected range of date, the data consistency is a crucial requirement in the project, especially when we need to involved the time feature in the analysis. Considering <code>SOL</code> is less popular among the seven chosen cryptos, after discussion, our team decided to remove <code>SOL</code> from the dataset in this project. Thus, the following analysis would be based on <code>ADA</code>, <code>BTC</code>, <code>DOGE</code>, <code>ETC</code>, <code>ETH</code>, <code>XRP</code> only.</p>
 
+</div>
 </div>
             </section>
 
