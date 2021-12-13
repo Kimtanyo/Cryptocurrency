@@ -1,2 +1,45 @@
 # Conclusion
 
+We first analyzed stock closing prices of 6 popular cryptocurrencies by researching on distribution and dependency relation of closing price to get a preliminary exploration of data features. And then we studied the correlation between each pair of stocks to improve our time series prediction later. Finally, we regarded closing prices as time series, decomposed them by method of STL and predicted their performances in the next few months. Combining our findings in these three parts, we can solve the problems mentioned in Chapter 1 Introduction.
+
+- Can we make use of features of data to establish a portfolio based on these cryptocurrencies’ stocks?
+
+  We find these cryptocurrencies have similar distribution density except BTC (after standardization). Furthermore, if we focus on 2020, each stock except ETC has great positive correlation. 
+  
+  - The correlation coefficient between BTC and ETH even rises up to 0.94, which means we can decide our investment strategy on BTC according to the changes of ETH. Here we cannot directly use the STL prediction of BTC to make a long-term investment plan because the irregular disturbance of BTC is extremely unstable on daily data.
+  
+  - ETC is unworthy of investing because its trend is too horizontal.
+    
+  - XRP will decrease steadily in the new few months so we should not solely invest on it.
+    
+  - ADA and DOGE will fall steadily and then start to rise steadily in the next few month so we can buy in after the beginning of increasing.
+    
+  - ETH has a relatively stable general rising prediction in the long term. Most of it irregular fluctuations gather in 2018 and it's remainders are relatively stable since 2019. Thus, ETh is worthy of investment in the long term.
+    
+To sum up, we can establish a portfolio consisting of ADA, DOGE and ETH. Note that we can only speculate on BTC according to the detailed daily changes of ETH rather than make a long term plan on it.
+  
+- When is a good time for investors to invest these cryptocurrencies and potentially gain the largest benefit?
+  
+  - The best time to invest on BTC is as soon as possible. Its rising trend is likely to last for a few days so that we should quickly buy in right now and sell out at saddle points when it tends to flatten.
+    
+  - The best time to invest on ADA and DOGE is when it start to rebounce after the steady decrease in a few months.
+    
+  - The best time to invest on ETH is when it starts to stablize for a few months.
+    
+  - The best time to invest on XRP is when we decide to buy in ETH according to their high positive correlation.
+    
+  - We do not recommend invest on ETC because it's too flat.
+  
+- Which one of these cryptocurrencies is still worth investing in the future?
+  
+  ADA, DOGE and ETH have great rising trend and their irregular disturbances are also relatively stable so they are still worth investing and holding for a long term.
+  
+  
+Our analysis meets our goal so that we solved our investigation problems. Furthermore, it can be also generalized to other stocks but these 6 representative popular crypocurrencies are enough for rookie investors to establish a portfolio and construct their investing strategy. In this project, we focus on our visualization instead of algorithms and models but we can still improve our prediction by several methods as below.
+
+1. Forecasting with ETS models
+
+2. Holt-Winters’ seasonal method
+
+3. Dynamic regression models
+  
