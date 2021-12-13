@@ -75,7 +75,13 @@
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
-<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
+<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-transformation.html"><a href="data-transformation.html#close-volume"><i class="fa fa-check"></i><b>3.1</b> Close &amp; Volume</a></li>
+<li class="chapter" data-level="3.2" data-path="data-transformation.html"><a href="data-transformation.html#return-standardized-return"><i class="fa fa-check"></i><b>3.2</b> Return &amp; Standardized Return</a></li>
+<li class="chapter" data-level="3.3" data-path="data-transformation.html"><a href="data-transformation.html#monthly-return-and-standardized-monthly-return"><i class="fa fa-check"></i><b>3.3</b> Monthly Return and Standardized Monthly Return</a></li>
+<li class="chapter" data-level="3.4" data-path="data-transformation.html"><a href="data-transformation.html#close-standardized-close"><i class="fa fa-check"></i><b>3.4</b> Close &amp; Standardized Close</a></li>
+</ul></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path="missing-values.html"><a href="missing-values.html#missing-data-pattern-detection"><i class="fa fa-check"></i><b>4.1</b> Missing Data Pattern Detection</a></li>
@@ -113,7 +119,7 @@
 <p>Our teams want to analyze the cryptocurrency market by analyzing seven chosen cryptos with large market cups. We aim to have seven stocks data within same range of date. We expected the seven stocks would all have data on each date when the stock market operates. In order to verify it, we performed the missing data pattern analysis. The result shows that there exists some missing data patterns in the stocks. The team investigated the patterns and gave the solution as described below.</p>
 <div id="missing-data-pattern-detection" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Missing Data Pattern Detection</h2>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>By inspecting the plots above, we can notice that there exists some missing data patterns among the seven crypto stocks. The plot shows that there are two types of patterns. The first pattern shows that <code>SOL</code> crypto has some entries which other cryptos don’t have. Meanwhile, the other pattern indicates that there are missing entries which happen only on <code>SOL</code> crypto. It looks like <code>SOL</code>’s data is not consistent with other cryptos on the dates. However, other six cryptos seems to have consistent data. To gain more information about it, we looked at the number of <code>null</code> data for each column as shown below.</p>
 <pre><code>##           Date  ADA_Adj.Close     ADA_Volume  BTC_Adj.Close     BTC_Volume 
 ##              0              4              4              4              4 
@@ -126,7 +132,7 @@
 <div id="missing-data-pattern-after-removing-sol" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Missing Data Pattern After Removing SOL</h2>
 <p>We now join the stock data of the chosen cryptos except <code>SOL</code>. And we plot the missing data pattern plot and the number of missing data rows again.
-<img src="finalproj_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<img src="finalproj_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <pre><code>##           Date  ADA_Adj.Close     ADA_Volume  BTC_Adj.Close     BTC_Volume 
 ##              0              0              0              0              0 
 ## DOGE_Adj.Close    DOGE_Volume  ETC_Adj.Close     ETC_Volume  ETH_Adj.Close 

@@ -193,7 +193,10 @@ plot_missing = function(mycars, percent = FALSE){
 ```
 
 ```{r}
-plot_missing(cryptos, percent = TRUE)
+#library(data.table)
+#tmp=data.table::copy(cryptos)
+cryptos$Date=as.Date(cryptos$Date)
+plot_missing(subset(cryptos,select=-c(Date)), percent = TRUE)
 ```
 
 By inspecting the plots above, we can notice that there exists some missing data patterns among the seven crypto stocks. The plot shows that there are two types of patterns. The first pattern shows that `SOL` crypto has some entries which other cryptos don't have. Meanwhile, the other pattern indicates that there are missing entries which happen only on `SOL` crypto. It looks like `SOL`'s data is not consistent with other cryptos on the dates. However, other six cryptos seems to have consistent data. To gain more information about it, we looked at the number of `null` data for each column as shown below.

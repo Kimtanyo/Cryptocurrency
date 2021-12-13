@@ -5,3 +5,13 @@ missing-values
 results
 interactive-component
 conclusion
+missing-data-pattern-detection
+missing-data-pattern-after-removing-sol
+solution-to-the-missing-data
+interactive-standardized-crypto-stocks
+interactive-single-stock
+test
+close-volume
+return-standardized-return
+monthly-return-and-standardized-monthly-return
+close-standardized-close
